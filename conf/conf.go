@@ -14,8 +14,8 @@ import (
 var usage = `Usage: ysab [Options]
 
 Options:
-  -r  Round of requests to run.
-  -n  Number of requests to run concurrently, n>0 if n>900 n will be set to 900.
+  -r  Round of request to run.
+  -n  Number of request to run concurrently, n>0. if n>900 n will be set to 900.
   -m  HTTP method, one of GET, POST, PUT, DELETE.
   -u  Url of request.
   -H  Add Arbitrary header line.

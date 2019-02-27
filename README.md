@@ -39,7 +39,8 @@ Options:
 
 ## Result show
 ```
-[yunson ~]# ysab -n 900 -r 30 -u http://10.121.130.218:8080/test
+(http://10.10.10.10:8080/test is API, it is writed by gin. That api whill only respone "hello word".)
+[yunson ~]# ysab -n 900 -r 30 -u http://10.10.10.10:8080/test
 
 Summary:
   Complete requests:	27000

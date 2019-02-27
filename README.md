@@ -36,8 +36,47 @@ Options:
       -urlfile /tmp/urls.txt
 ```
 
+
+## Result show
+```
+[yunson ~]# ysab -n 900 -r 30 -u http://10.121.130.218:8080/test
+
+Summary:
+  Complete requests:	27000
+  Failed requests:	0
+  Total data size(ContentLength):	324000
+  Data size/request:	12
+  Max use time:		257 ms
+  Min use time:		10 ms
+  Average use time:	36.074 ms
+  Requests/sec:		13500
+
+QPS time histogram (timestamp: requests):
+  1551254255:		14198
+  1551254256:		12802
+
+
+Use Time Percent:
+  <=50ms:		  87.74%
+  <=100ms:		  99.31%
+  <=300ms:		  100.00%
+  <=500ms:		  100.00%
+  >500ms:		  0.00%
+
+Code Time histogram (code: requests):
+  200:		27000
+
+
+Time detail (ms)
+  item		min		mean		max
+  dns		0		0		0
+  conn		0		1.088		51
+  wait		10		33.82		257
+  resp		0		0.596		28
+```
+
 ## Note
-* use urlsfile
+* use -urlsfile
 ```
 You can use -urlsfile to send multiple requests with different body.
 cmd example:
@@ -45,4 +84,11 @@ cmd example:
 urls.txt exaple:
 	examples/urls.txt
 	You can use create_urls.py to create a urls.txt file.
+```
+* use -u
+```
+example:
+    ysab -n 900 -r 30 -u "http://10.121.130.218:8080/test"
+    ysab -n 900 -r 30 -u 'http://10.121.130.218:8080/test'
+    ysab -n 900 -r 30 -u http://10.121.130.218:8080/test
 ```

@@ -18,10 +18,6 @@ var (
 	urlChanel = make(chan [2]string, 30000)
 )
 
-func sendRes() {
-
-}
-
 func worker(method string) {
 	wf := yshttp.Get
 	switch method {

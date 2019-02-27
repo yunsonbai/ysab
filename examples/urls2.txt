@@ -1,0 +1,2 @@
+-u http://127.0.0.1:8080/add -d {"name":"other", "blog": "https://other.top"}
+-u http://127.0.0.1:8080/add -d {"name":"yunson", "blog": "https://yunsonbai.top"}

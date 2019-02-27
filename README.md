@@ -36,6 +36,11 @@ Options:
       -urlfile /tmp/urls.txt
 ```
 
+## Some examples
+* e1: ysab -n 900 -r 30 -u http://10.10.10.10:8080/test
+* e2: ysab -n 900 -urlsfile ./examples/urls.txt
+* e3: ysab -n 900 -r 30 -u http://10.10.10.10:8080/add -d '{"name": "yunson"}'
+* e4: ysab -n 900 -urlsfile -m POST ./examples/urls2.txt
 
 ## Result show
 ```

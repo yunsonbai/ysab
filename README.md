@@ -44,7 +44,7 @@ Options:
 
 ## Result show
 ```
-(http://10.10.10.10:8080/test is API, it is writed by gin. The api will respone "hello word".)
+(http://10.10.10.10:8080/test is API, it is writed by gin. The api will respone "hello world".)
 [yunson ~]# ysab -n 900 -r 30 -u http://10.10.10.10:8080/test
 
 Summary:

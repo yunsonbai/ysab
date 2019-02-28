@@ -1,6 +1,7 @@
 ## Ysab
 ```
 ysab is a tool, that can help you to get some performance parameters of your http server.
+It can help you to send multiple urls with different parameters.
 ```
 
 ## Installation

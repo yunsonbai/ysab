@@ -25,6 +25,10 @@ func worker(method string) {
 		wf = yshttp.Get
 	case "POST":
 		wf = yshttp.Post
+	case "PUT":
+		wf = yshttp.Post
+	case "DELETE":
+		wf = yshttp.Post
 	default:
 		return
 	}

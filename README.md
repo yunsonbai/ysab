@@ -1,5 +1,5 @@
 
-![ysab](https://yunsonbai.github.io/images/golang/ysab2.jpeg)
+![ysab](https://github.com/yunsonbai/ysab/blob/master/ysab2.jpeg)
 
 ysab is a tool, that can help you to get some performance parameters of your http server.
 It can help you to send multiple urls with different parameters.

@@ -6,8 +6,8 @@ It can help you to send multiple urls with different parameters.
 
 ## Installation
 * step 1:
-    * Linux: wget https://github.com/yunsonbai/ysab/releases/download/v0.1/ysab_Linux_0.1.tgz 
-    * MacOS: wget https://github.com/yunsonbai/ysab/releases/download/v0.1/ysab_macOS_0.1.tgz
+    * Linux: wget https://github.com/yunsonbai/ysab/releases/download/v0.2.0/ysab_linux_0.2.0.tgz 
+    * MacOS: wget https://github.com/yunsonbai/ysab/releases/download/v0.2.0/ysab_mac_0.2.0.tgz
 * step 2:
     * tar -zxvf ysab_x_x.tgz
 

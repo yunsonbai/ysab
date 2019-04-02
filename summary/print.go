@@ -4,33 +4,25 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"sort"
 	"text/template"
 )
 
 var (
 	htmlTemplate = `
 Summary:
-  Complete requests:	{{ .CompleteRequests }}
-  Failed requests:	{{ .FailedRequests }}
-  Total data size:	{{ .TotalDataSize }}
-  Data size/request:	{{ .AvgDataSize }}
-  Max use time:		{{.MaxUseTime}} ms
-  Min use time:		{{.MinUseTime}} ms
-  Average use time:	{{.AvgUseTime}} ms
-  Requests/sec:		{{ .RequestsPerSec }}
+  Complete requests:		{{ .CompleteRequests }}
+  Failed requests:		{{ .FailedRequests }}
+  Time taken (s):		{{ .TimeToken }}
+  Total data size (Byte):	{{ .TotalDataSize }}
+  Data size/request (Byte):	{{ .AvgDataSize }}
+  Max use time (ms):		{{.MaxUseTime}}
+  Min use time (ms):		{{.MinUseTime}}
+  Average use time (ms):	{{.AvgUseTime}}
+  Requests/sec:			{{ .RequestsPerSec }}
 
-QPS time histogram (timestamp: requests):
-{{ formatMap .QpsDetail }}
-
-Use Time Percent:
-  <=50ms:		{{ .Tlt50mPercent }}
-  <=100ms:		{{ .Tlt100mPercent }}
-  <=300ms:		{{ .Tlt300mPercent }}
-  <=500ms:		{{ .Tlt500mPercent }}
-  >500ms:		{{ .Tgt500mPercent }}
-
-Code Time histogram (code: requests):
-{{ formatMap .CodeDetail }}
+Percentage of waiting time (ms):
+{{ formatMap .WaitingTimeDetail }}
 
 Time detail (ms)
   item		min		mean		max
@@ -38,13 +30,23 @@ Time detail (ms)
   conn		{{.MinConn}}		{{.AvgConn}}		{{.MaxConn}}
   wait		{{.MinDelay}}		{{.AvgDelay}}		{{.MaxDelay}}
   resp		{{.MinRes}}		{{.AvgRes}}		{{.MaxRes}}		  
+
+Response Time histogram (code: requests):
+{{ formatMap .CodeDetail }}
 `
 )
 
-func formatMap(data map[int]int) string {
+func formatMap(data map[string]int) string {
+	var keys []string
+
+	for k, _ := range data {
+		keys = append(keys, k)
+
+	}
+	sort.Strings(keys)
 	res := new(bytes.Buffer)
-	for k, v := range data {
-		res.WriteString(fmt.Sprintf("  %d:\t\t%d\n", k, v))
+	for _, k := range keys {
+		res.WriteString(fmt.Sprintf("  %s:\t\t%d\n", k, data[k]))
 	}
 	return res.String()
 }
@@ -54,7 +56,6 @@ var tmplFuncMap = template.FuncMap{
 }
 
 func Print(summaryData SummaryData) {
-	// fmt.Println("summaryData:", summaryData)
 
 	tmpl, err := template.New("test").Funcs(tmplFuncMap).Parse(htmlTemplate)
 	if err != nil {

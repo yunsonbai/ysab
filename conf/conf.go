@@ -43,6 +43,8 @@ type Config struct {
 	TimeOut     int    //单次请求超时时间
 	Method      string // 请求方法
 	Body        string
+	StartTime   int
+	EndTime     int
 }
 
 type headersSlice []string
@@ -177,4 +179,5 @@ func init() {
 	if Conf.TimeOut <= 0 || Conf.TimeOut > 60 {
 		Conf.TimeOut = 60
 	}
+	Conf.StartTime = int(tools.GetNowUnixNano())
 }

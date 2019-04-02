@@ -2,6 +2,8 @@ package summary
 
 import (
 	"math"
+	"sort"
+	"strconv"
 	"sync"
 	"ysab/conf"
 	"ysab/tools"
@@ -11,18 +13,20 @@ var (
 	AnalysisData  sync.Map
 	ResChanel     = make(chan Res, 50000)
 	RunOverSignal = make(chan int, 1)
-	summaryData   = SummaryData{
-		CodeDetail: make(map[int]int),
-		QpsDetail:  make(map[int]int),
-		MinConn:    float64(config.TimeOut),
-		MinDNS:     float64(config.TimeOut),
-		MinDelay:   float64(config.TimeOut),
-		MinReq:     float64(config.TimeOut),
-		MinUseTime: float64(config.TimeOut),
-		MinRes:     float64(config.TimeOut),
+
+	codeDetail  = make(map[int]int)
+	summaryData = SummaryData{
+		CodeDetail:        make(map[string]int),
+		WaitingTimeDetail: make(map[string]int),
+		MinConn:           float64(config.TimeOut),
+		MinDNS:            float64(config.TimeOut),
+		MinDelay:          float64(config.TimeOut),
+		MinReq:            float64(config.TimeOut),
+		MinUseTime:        float64(config.TimeOut),
+		MinRes:            float64(config.TimeOut),
 	}
-	tmpSummaryData = TmpSummaryData{}
-	config         = conf.Conf
+	config    = conf.Conf
+	waitTimes = make([]float64, 0, config.UrlNum)
 )
 
 type Res struct {
@@ -37,32 +41,19 @@ type Res struct {
 	ResTime      float64
 }
 
-type TmpSummaryData struct {
-	Tlt50mNum  int
-	Tlt100mNum int
-	Tlt300mNum int
-	Tlt500mNum int
-	Tgt500mNum int
-}
-
 type SummaryData struct {
 	CompleteRequests int
 	FailedRequests   int
+	TimeToken        float64
 	TotalDataSize    int
 	AvgDataSize      int
-	QpsDetail        map[int]int
 	RequestsPerSec   float64
 
-	Tlt50mPercent  string
-	Tlt100mPercent string
-	Tlt300mPercent string
-	Tlt500mPercent string
-	Tgt500mPercent string
-
-	MinUseTime float64
-	MaxUseTime float64
-	AvgUseTime float64
-	CodeDetail map[int]int
+	MinUseTime        float64
+	MaxUseTime        float64
+	AvgUseTime        float64
+	CodeDetail        map[string]int
+	WaitingTimeDetail map[string]int
 
 	AvgConn  float64
 	MaxConn  float64
@@ -83,7 +74,6 @@ type SummaryData struct {
 
 func HandleRes() {
 	for {
-
 		res, ok := <-ResChanel
 		if !ok {
 			break
@@ -94,34 +84,17 @@ func HandleRes() {
 			close(ResChanel)
 		}
 		code := res.Code
-		if _, ok := summaryData.CodeDetail[code]; ok {
-			summaryData.CodeDetail[code]++
+		if _, ok := codeDetail[code]; ok {
+			codeDetail[code]++
 		} else {
-			summaryData.CodeDetail[code] = 1
+			codeDetail[code] = 1
 		}
-		if _, ok := summaryData.QpsDetail[res.TimeStamp]; ok {
-			summaryData.QpsDetail[res.TimeStamp]++
-		} else {
-			summaryData.QpsDetail[res.TimeStamp] = 1
+		if config.EndTime < res.TimeStamp {
+			config.EndTime = res.TimeStamp
 		}
 		if code != 200 {
 			summaryData.FailedRequests++
 		}
-		if res.TotalUseTime <= 50 {
-			tmpSummaryData.Tlt50mNum++
-		}
-		if res.TotalUseTime <= 100 {
-			tmpSummaryData.Tlt100mNum++
-		}
-		if res.TotalUseTime <= 300 {
-			tmpSummaryData.Tlt300mNum++
-		}
-		if res.TotalUseTime <= 500 {
-			tmpSummaryData.Tlt500mNum++
-		} else {
-			tmpSummaryData.Tgt500mNum++
-		}
-
 		summaryData.AvgUseTime += res.TotalUseTime
 		summaryData.AvgConn += res.ConnTime
 		summaryData.AvgDNS += res.DNSTime
@@ -142,20 +115,9 @@ func HandleRes() {
 		summaryData.MaxDelay = math.Max(res.DelayTime, summaryData.MaxDelay)
 		summaryData.MaxReq = math.Max(res.ReqTime, summaryData.MaxReq)
 		summaryData.MaxRes = math.Max(res.ResTime, summaryData.MaxRes)
+		waitTimes = append(waitTimes, res.TotalUseTime)
 
 	}
-	summaryData.Tlt50mPercent = tools.FloatToPercent(
-		float64(tmpSummaryData.Tlt50mNum) / float64(config.UrlNum))
-	summaryData.Tlt100mPercent = tools.FloatToPercent(
-		float64(tmpSummaryData.Tlt100mNum) / float64(config.UrlNum))
-	summaryData.Tlt300mPercent = tools.FloatToPercent(
-		float64(tmpSummaryData.Tlt300mNum) / float64(config.UrlNum))
-
-	summaryData.Tlt500mPercent = tools.FloatToPercent(
-		float64(tmpSummaryData.Tlt500mNum) / float64(config.UrlNum))
-
-	summaryData.Tgt500mPercent = tools.FloatToPercent(
-		float64(tmpSummaryData.Tgt500mNum) / float64(config.UrlNum))
 
 	summaryData.AvgUseTime = tools.Decimal2(summaryData.AvgUseTime / float64(config.UrlNum))
 	summaryData.AvgConn = tools.Decimal2(summaryData.AvgConn / float64(config.UrlNum))
@@ -165,19 +127,21 @@ func HandleRes() {
 	summaryData.AvgRes = tools.Decimal2(summaryData.AvgRes / float64(config.UrlNum))
 	summaryData.AvgDataSize = summaryData.TotalDataSize / config.UrlNum
 
-	qpsL := len(summaryData.QpsDetail)
-	min_v := 1000000000.0
-	max_v := 0.0
-	for _, v := range summaryData.QpsDetail {
-		min_v = math.Min(float64(v), min_v)
-		max_v = math.Max(float64(v), max_v)
-		summaryData.RequestsPerSec += float64(v)
+	for k, v := range codeDetail {
+		summaryData.CodeDetail[strconv.Itoa(k)] = v
 	}
-	if qpsL >= 3 {
-		summaryData.RequestsPerSec = summaryData.RequestsPerSec - (min_v + max_v)
-		qpsL = qpsL - 2
+
+	t := (float64(config.EndTime-config.StartTime) / 10e8)
+	summaryData.TimeToken = t
+	summaryData.RequestsPerSec = float64(config.UrlNum) / t
+	sort.Float64s(waitTimes)
+	waitTimesL := float64(len(waitTimes))
+	tps := []float64{0.1, 0.25, 0.5, 0.75, 0.9, 0.95, 0.99, 0.999, 0.9999}
+	tpsL := len(tps)
+	for i := 0; i < tpsL; i++ {
+		summaryData.WaitingTimeDetail[tools.FloatToPercent(
+			tps[i])] = int(waitTimes[int(waitTimesL*tps[i]-1)])
 	}
-	summaryData.RequestsPerSec = summaryData.RequestsPerSec / float64(qpsL)
 
 	Print(summaryData)
 }

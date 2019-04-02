@@ -44,10 +44,7 @@ func do(url string, method string, headers map[string]string, bodydata string) s
 	var size, tmpt int64
 	var dnsStart, connStart, respStart, reqStart, delayStart int64
 	var dnsDuration, connDuration, respDuration, reqDuration, delayDuration int64
-	tStart := tools.GetNowUnixNano()
-
 	req, err := http.NewRequest(method, url, bytes.NewBuffer([]byte(bodydata)))
-
 	if err != nil {
 		return summary.Res{}
 	}
@@ -83,10 +80,15 @@ func do(url string, method string, headers map[string]string, bodydata string) s
 		},
 	}
 	req = req.WithContext(httptrace.WithClientTrace(req.Context(), trace))
+	tStart := tools.GetNowUnixNano()
 	response, err := httpClient.Do(req)
-
+	tEnd := tools.Now()
 	if err == nil {
-		size = response.ContentLength
+		if response.ContentLength > -1 {
+			size = response.ContentLength
+		} else {
+			size = 0
+		}
 		code = response.StatusCode
 		io.Copy(ioutil.Discard, response.Body)
 		response.Body.Close()
@@ -101,11 +103,10 @@ func do(url string, method string, headers map[string]string, bodydata string) s
 			code = 500
 		}
 	}
-	tEnd := tools.Now()
 	respDuration = tEnd.UnixNano() - respStart
 	return summary.Res{
 		Size:         int(size),
-		TimeStamp:    int(tEnd.Unix()),
+		TimeStamp:    int(tEnd.UnixNano()),
 		TotalUseTime: float64((tEnd.UnixNano() - tStart) / 10e5),
 		Code:         code,
 		ConnTime:     float64(connDuration / 10e5),

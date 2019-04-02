@@ -96,7 +96,8 @@ func StartWork() {
 		summary.HandleRes()
 		rwg.Done()
 	}()
-	for index := 0; index < config.N; index++ {
+	n := config.N
+	for index := 0; index < n; index++ {
 		go func() {
 			worker(config.Method)
 			rwg.Done()

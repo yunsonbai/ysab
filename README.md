@@ -49,37 +49,38 @@ Options:
 [yunson ~]# ysab -n 900 -r 30 -u http://10.10.10.10:8080/test
 
 Summary:
-  Complete requests:	27000
-  Failed requests:	0
-  Total data size(ContentLength):	324000
-  Data size/request:	12
-  Max use time:		257 ms
-  Min use time:		10 ms
-  Average use time:	36.074 ms
-  Requests/sec:		13500
+  Complete requests:		2700
+  Failed requests:		2550
+  Time taken (s):		2.203996471
+  Total data size (Byte):	0
+  Data size/request (Byte):	0
+  Max use time (ms):		2076
+  Min use time (ms):		3
+  Average use time (ms):	139.997
+  Requests/sec:			1225.047333571706
 
-QPS time histogram (timestamp: requests):
-  1551254255:		14198
-  1551254256:		12802
-
-
-Use Time Percent:
-  <=50ms:		  87.74%
-  <=100ms:		  99.31%
-  <=300ms:		  100.00%
-  <=500ms:		  100.00%
-  >500ms:		  0.00%
-
-Code Time histogram (code: requests):
-  200:		27000
+Percentage of waiting time (ms):
+    10.00%:		12
+    25.00%:		26
+    50.00%:		46
+    75.00%:		69
+    90.00%:		122
+    95.00%:		1291
+    99.00%:		1992
+    99.90%:		2040
+    99.99%:		2052
 
 
 Time detail (ms)
   item		min		mean		max
   dns		0		0		0
-  conn		0		1.088		51
-  wait		10		33.82		257
-  resp		0		0.596		28
+  conn		0		11.714		78
+  wait		3		69.509		1010
+  resp		0		10.53		50
+
+Response Time histogram (code: requests):
+  200:		150
+  429:		2550
 ```
 
 ## Note

@@ -44,10 +44,15 @@ func do(url string, method string, headers map[string]string, bodydata string) s
 	var size, tmpt int64
 	var dnsStart, connStart, respStart, reqStart, delayStart int64
 	var dnsDuration, connDuration, respDuration, reqDuration, delayDuration int64
+
 	req, err := http.NewRequest(method, url, bytes.NewBuffer([]byte(bodydata)))
 	if err != nil {
 		return summary.Res{}
 	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "*/*")
+	req.Header.Set("Connection", "keep-alive")
+	req.Header.Set("Accept-Encoding", "gzip, deflate")
 	for k, v := range headers {
 		req.Header.Set(k, v)
 	}

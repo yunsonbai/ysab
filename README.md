@@ -10,6 +10,7 @@ It can help you to send multiple urls with different parameters.
     * MacOS: wget https://github.com/yunsonbai/ysab/releases/download/v0.2.0/ysab_mac_0.2.0.tgz
 * step 2:
     * mv ysab_x_x ysab
+    * chmod 777 ysab
 
 * step 3:
     * mv ysab /usr/bin/

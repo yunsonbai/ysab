@@ -16,7 +16,7 @@ var usage = `Usage: ysab [Options]
 Options:
   -r  Round of request to run.
   -n  Number of request to run concurrently, n>0. if n>900 n will be set to 900.
-  -m  HTTP method, one of GET, POST, PUT, DELETE.
+  -m  HTTP method, one of GET, POST, PUT, DELETE, HEAD.
   -u  Url of request.
   -H  Add Arbitrary header line.
       For examples:
@@ -90,7 +90,7 @@ func arrangeOptions() {
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, usage)
 	}
-	methods := [4]string{"GET", "POST", "PUT", "DELETE"}
+	methods := [5]string{"GET", "POST", "PUT", "DELETE", "HEAD"}
 	help := flag.Bool("h", false, "")
 	m := flag.String("m", "GET", "")
 	flag.Var(&headers, "H", "")

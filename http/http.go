@@ -123,10 +123,13 @@ func do(url string, method string, headers map[string]string, bodydata string) s
 
 }
 
+func Head(url string, headers map[string]string, data string) summary.Res {
+	return do(url, "HEAD", headers, data)
+}
+
 func Get(url string, headers map[string]string, data string) summary.Res {
 	return do(url, "GET", headers, data)
 }
-
 func Post(url string, headers map[string]string, data string) summary.Res {
 	return do(url, "POST", headers, data)
 }

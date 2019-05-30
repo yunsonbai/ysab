@@ -29,6 +29,8 @@ func worker(method string) {
 		wf = yshttp.Post
 	case "DELETE":
 		wf = yshttp.Post
+	case "HEAD":
+		wf = yshttp.Head
 	default:
 		return
 	}

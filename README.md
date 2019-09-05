@@ -6,8 +6,8 @@ It can help you to send multiple urls with different parameters.
 
 ## Installation
 * step 1:
-    * Linux: wget https://github.com/yunsonbai/ysab/releases/download/v0.2.0/ysab_linux_0.2.0.tgz 
-    * MacOS: wget https://github.com/yunsonbai/ysab/releases/download/v0.2.0/ysab_mac_0.2.0.tgz
+    * Linux: wget https://github.com/yunsonbai/ysab/releases/download/v0.3.0/ysab_linux_0.3.0
+    * MacOS: wget https://github.com/yunsonbai/ysab/releases/download/v0.3.0/ysab_mac_0.3.0
 * step 2:
     * mv ysab_x_x ysab
     * chmod 777 ysab
@@ -83,6 +83,13 @@ Response Time histogram (code: requests):
   200:		150
   429:		2550
 ```
+
+## about http code
+* 2xx: Success
+* 5xx:
+    * 500: Server Error
+    * 503: May be connection refused or connection reset by peer, you need to check your server.
+* other: [http code](https://en.wikipedia.org/wiki/List_of_HTTP_status_codes)
 
 ## Note
 * use -urlsfile

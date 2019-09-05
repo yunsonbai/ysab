@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"io"
 	"io/ioutil"
-	"net"
 	"net/http"
 	"net/http/httptrace"
 	netulr "net/url"
@@ -44,7 +43,6 @@ func do(url string, method string, headers map[string]string, bodydata string) s
 	var size, tmpt int64
 	var dnsStart, connStart, respStart, reqStart, delayStart int64
 	var dnsDuration, connDuration, respDuration, reqDuration, delayDuration int64
-
 	req, err := http.NewRequest(method, url, bytes.NewBuffer([]byte(bodydata)))
 	if err != nil {
 		return summary.Res{}
@@ -88,7 +86,7 @@ func do(url string, method string, headers map[string]string, bodydata string) s
 	tStart := tools.GetNowUnixNano()
 	response, err := httpClient.Do(req)
 	tEnd := tools.Now()
-	if err == nil {
+	if response != nil {
 		if response.ContentLength > -1 {
 			size = response.ContentLength
 		} else {
@@ -98,16 +96,14 @@ func do(url string, method string, headers map[string]string, bodydata string) s
 		io.Copy(ioutil.Discard, response.Body)
 		response.Body.Close()
 	} else {
+		code = 503
 		if err, ok := err.(*netulr.Error); ok {
-			if err2, ok := err.Err.(net.Error); ok {
-				if err2.Timeout() {
-					code = 504
-				}
+			if err.Timeout() {
+				code = 504
 			}
-		} else {
-			code = 500
 		}
 	}
+
 	respDuration = tEnd.UnixNano() - respStart
 	return summary.Res{
 		Size:         int(size),

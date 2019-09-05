@@ -92,7 +92,7 @@ func HandleRes() {
 		if config.EndTime < res.TimeStamp {
 			config.EndTime = res.TimeStamp
 		}
-		if code != 200 {
+		if code > 299 || code < 200 {
 			summaryData.FailedRequests++
 		}
 		summaryData.AvgUseTime += res.TotalUseTime

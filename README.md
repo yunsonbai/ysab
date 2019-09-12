@@ -50,16 +50,16 @@ Options:
 [yunson ~]# ysab -n 900 -r 30 -u http://10.10.10.10:8080/test
 
 Summary:
-  Complete requests:        2700
-  Failed requests:          2550
-  Time taken (s):           2.203996471
-  Total data size (Byte):		0
+  Complete requests:		2700
+  Failed requests:		2550
+  Time taken (s):		2.203996471
+  Total data size (Byte):	0
   Data size/request (Byte):	0
-  Max use time (ms):				2076
-  Min use time (ms):				3
-  Average use time (ms):		139.997
-  Requests/sec:             1225.047333571706
-  SuccessRequests/sec:			68.05818519842812
+  Max use time (ms):		2076
+  Min use time (ms):		3
+  Average use time (ms):	139.997
+  Requests/sec:			1225.047333571706
+  SuccessRequests/sec:		68.05818519842812
 
 Percentage of waiting time (ms):
     10.00%:		12

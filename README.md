@@ -87,10 +87,11 @@ Response Time histogram (code: requests):
 
 ## about http code
 * 2xx: Success
-* 5xx:
-    * 500: Server Error
-    * 503: May be connection refused or connection reset by peer, you need to check your server.
-* other: [http code](https://en.wikipedia.org/wiki/List_of_HTTP_status_codes)
+* != 2xx: Faild
+    * 5xx:
+        * 500: Server Error
+        * 503: May be connection refused or connection reset by peer, you need to check your server.
+    * other: [http code](https://en.wikipedia.org/wiki/List_of_HTTP_status_codes)
 
 ## Note
 * use -urlsfile

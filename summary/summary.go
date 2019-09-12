@@ -42,12 +42,14 @@ type Res struct {
 }
 
 type SummaryData struct {
-	CompleteRequests int
-	FailedRequests   int
-	TimeToken        float64
-	TotalDataSize    int
-	AvgDataSize      int
-	RequestsPerSec   float64
+	CompleteRequests      int
+	FailedRequests        int
+	SuccessRequests       int
+	TimeToken             float64
+	TotalDataSize         int
+	AvgDataSize           int
+	RequestsPerSec        float64
+	SuccessRequestsPerSec float64
 
 	MinUseTime        float64
 	MaxUseTime        float64
@@ -94,6 +96,8 @@ func HandleRes() {
 		}
 		if code > 299 || code < 200 {
 			summaryData.FailedRequests++
+		} else {
+			summaryData.SuccessRequests++
 		}
 		summaryData.AvgUseTime += res.TotalUseTime
 		summaryData.AvgConn += res.ConnTime
@@ -134,6 +138,7 @@ func HandleRes() {
 	t := (float64(config.EndTime-config.StartTime) / 10e8)
 	summaryData.TimeToken = t
 	summaryData.RequestsPerSec = float64(config.UrlNum) / t
+	summaryData.SuccessRequestsPerSec = float64(summaryData.SuccessRequests) / t
 	sort.Float64s(waitTimes)
 	waitTimesL := float64(len(waitTimes))
 	tps := []float64{0.1, 0.25, 0.5, 0.75, 0.9, 0.95, 0.99, 0.999, 0.9999}
@@ -142,6 +147,5 @@ func HandleRes() {
 		summaryData.WaitingTimeDetail[tools.FloatToPercent(
 			tps[i])] = int(waitTimes[int(waitTimesL*tps[i]-1)])
 	}
-
 	Print(summaryData)
 }

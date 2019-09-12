@@ -6,8 +6,8 @@ It can help you to send multiple urls with different parameters.
 
 ## Installation
 * step 1:
-    * Linux: wget https://github.com/yunsonbai/ysab/releases/download/v0.4.0/ysab_linux_0.4.0.tgz
-    * MacOS: wget https://github.com/yunsonbai/ysab/releases/download/v0.4.0/ysab_mac_0.4.0.tzg
+    * Linux: wget https://github.com/yunsonbai/ysab/releases/download/v0.4.1/ysab_linux_0.4.1.tgz
+    * MacOS: wget https://github.com/yunsonbai/ysab/releases/download/v0.4.1/ysab_mac_0.4.1.tzg
 * step 2:
     * mv ysab_x_x ysab
     * chmod 777 ysab
@@ -51,14 +51,15 @@ Options:
 
 Summary:
   Complete requests:		2700
-  Failed requests:		2550
-  Time taken (s):		2.203996471
+  Failed requests:		    2550
+  Time taken (s):		    2.203996471
   Total data size (Byte):	0
   Data size/request (Byte):	0
   Max use time (ms):		2076
   Min use time (ms):		3
   Average use time (ms):	139.997
-  Requests/sec:			1225.047333571706
+  Requests/sec:			    1225.047333571706
+  SuccessRequests/sec:		68.05818519842812
 
 Percentage of waiting time (ms):
     10.00%:		12

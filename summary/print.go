@@ -20,6 +20,7 @@ Summary:
   Min use time (ms):		{{.MinUseTime}}
   Average use time (ms):	{{.AvgUseTime}}
   Requests/sec:			{{ .RequestsPerSec }}
+  SuccessRequests/sec:		{{ .SuccessRequestsPerSec }}
 
 Percentage of waiting time (ms):
 {{ formatMap .WaitingTimeDetail }}

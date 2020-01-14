@@ -9,8 +9,9 @@ It can help you to send multiple urls with different parameters.
     * Linux: wget https://github.com/yunsonbai/ysab/releases/download/v0.4.2/ysab_linux_0.4.2.tgz
     * MacOS: wget https://github.com/yunsonbai/ysab/releases/download/v0.4.2/ysab_mac_0.4.2.tgz
 * step 2:
+    * tar -zxvf ysab_x_x.tgz
     * mv ysab_x_x ysab
-    * chmod 777 ysab
+    * chmod +x ysab
 
 * step 3:
     * mv ysab /usr/bin/

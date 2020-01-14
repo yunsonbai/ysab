@@ -6,8 +6,8 @@ It can help you to send multiple urls with different parameters.
 
 ## Installation
 * step 1:
-    * Linux: wget https://github.com/yunsonbai/ysab/releases/download/v0.4.1/ysab_linux_0.4.1.tgz
-    * MacOS: wget https://github.com/yunsonbai/ysab/releases/download/v0.4.1/ysab_mac_0.4.1.tgz
+    * Linux: wget https://github.com/yunsonbai/ysab/releases/download/v0.4.2/ysab_linux_0.4.2.tgz
+    * MacOS: wget https://github.com/yunsonbai/ysab/releases/download/v0.4.2/ysab_mac_0.4.2.tgz
 * step 2:
     * mv ysab_x_x ysab
     * chmod 777 ysab
@@ -19,10 +19,13 @@ It can help you to send multiple urls with different parameters.
 ## Usage
 ```
 Options:
-  -r  Round of request to run.
-  -n  Number of request to run concurrently, n>0 if n>900 n will be set to 900.
-  -m  HTTP method, one of GET, POST, PUT, DELETE.
-  -u  Url of request.
+  -r  Rounds of request to run, total requests equal r * n
+  -n  Number of multiple requests to make at a time, n>0 if n>900 n will be set to 900.
+  -m  HTTP method, one of GET, POST, PUT, DELETE. Default: GET
+  -u  Url of request, use " or ' please, if there are special symbols
+      For examples: 
+      -u "https://yunsonbai.top/?name='"
+      -u 'https://yunsonbai.top/?name="'
   -H  Add Arbitrary header line.
       For examples:
       -H "Accept: text/html". Set Accept to header.
@@ -39,10 +42,10 @@ Options:
 ```
 
 ## Some examples
-* e1: ysab -n 900 -r 30 -u http://10.10.10.10:8080/test
-* e2: ysab -n 900 -urlsfile ./examples/urls.txt
-* e3: ysab -n 900 -r 30 -u http://10.10.10.10:8080/add -d '{"name": "yunson"}'
-* e4: ysab -n 900 -urlsfile -m POST ./examples/urls2.txt
+* e1: ysab -n 900 -r 2 -u http://10.10.10.10:8080/test
+* e2: ysab -n 900 -urlsfile ./examples/get_urls.txt
+* e3: ysab -n 900 -r 2 -m POST -u http://10.10.10.10:8080/add -d '{"name": "yunson"}'
+* e4: ysab -n 900 -urlsfile -m POST ./examples/post_urls.txt
 
 ## Result show
 ```
@@ -98,9 +101,10 @@ Response Time histogram (code: requests):
 ```
 You can use -urlsfile to send multiple requests with different body.
 cmd example:
-	ysab -n 800 -urlsfile ./examples/urls.txt
+	ysab -n 500 -urlsfile ./examples/get_urls.txt
+    ysab -n 500 -urlsfile -m POST ./examples/post_urls.txt
 
-urls.txt exaple:
+urls.txt example:
 	examples/urls.txt
 	You can use create_urls.py to create a urls.txt file.
 ```

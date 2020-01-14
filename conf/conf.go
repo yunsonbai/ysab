@@ -14,10 +14,13 @@ import (
 var usage = `Usage: ysab [Options]
 
 Options:
-  -r  Round of request to run.
-  -n  Number of request to run concurrently, n>0. if n>900 n will be set to 900.
-  -m  HTTP method, one of GET, POST, PUT, DELETE, HEAD.
-  -u  Url of request.
+  -r  Rounds of request to run, total requests equal r * n
+  -n  Number of multiple requests to make at a time, n>0 if n>900 n will be set to 900.
+  -m  HTTP method, one of GET, POST, PUT, DELETE. Default: GET
+  -u  Url of request, use " or ' please, if there are special symbols
+      For examples: 
+      -u "https://yunsonbai.top/?name='"
+      -u 'https://yunsonbai.top/?name="'
   -H  Add Arbitrary header line.
       For examples:
       -H "Accept: text/html". Set Accept to header.
@@ -54,7 +57,7 @@ var (
 		Headers: make(map[string]string),
 	}
 	fbr     *bufio.Reader
-	VERSION = "version is 0.4.0"
+	VERSION = "version is 0.4.2"
 	headers headersSlice
 )
 

@@ -1,12 +1,21 @@
 
 ![ysab](https://github.com/yunsonbai/ysab/blob/master/ysab2.jpeg)
 
-ysab 是一个可以帮助你获取http服务器压力测试性能指标的工具，有点像Apache的ab。不同的是，它可以帮你发送携带不同参数的请求，这样你就可以便捷地重放线上的真实请求。
+ysab is a tool that can help you get some performance parameters of http server stress test.
+It can help you send requests with different parameters, so you can easily replay the real request online.
 
-[English](./README-ENGLISH.md)
+## Installation
+* step 1:
+    * Linux: wget https://github.com/yunsonbai/ysab/releases/download/v0.4.2/ysab_linux_0.4.2.tgz
+    * MacOS: wget https://github.com/yunsonbai/ysab/releases/download/v0.4.2/ysab_mac_0.4.2.tgz
+* step 2:
+    * tar -zxvf ysab_x_x.tgz
+    * mv ysab_x_x ysab
+    * chmod +x ysab
 
-## 安装
-* git clone git@github.com:yunsonbai/ysab.git
+* step 3:
+    * mv ysab /usr/bin/
+
 
 ## Usage
 ```

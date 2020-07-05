@@ -5,33 +5,33 @@ ysab is a tool that can help you get some performance parameters of http server 
 It can help you send requests with different parameters, so you can easily replay the real request online.
 
 ## Installation
-* step 1:
-    * Linux: wget https://github.com/yunsonbai/ysab/releases/download/v0.4.2/ysab_linux_0.4.2.tgz
-    * MacOS: wget https://github.com/yunsonbai/ysab/releases/download/v0.4.2/ysab_mac_0.4.2.tgz
-* step 2:
-    * tar -zxvf ysab_x_x.tgz
-    * mv ysab_x_x ysab
-    * chmod +x ysab
+* mac
 
-* step 3:
-    * mv ysab /usr/bin/
+wget https://github.com/yunsonbai/ysab/releases/download/v0.4.2/install_mac && sh install_mac && rm -rf install_mac
+
+If you cannot enter the ysab command after installation, you can restart the terminal or execute source /etc/profile.
+
+* linux
+
+wget https://github.com/yunsonbai/ysab/releases/download/v0.4.2/install_linux && sh ./install_linux && rm -rf ./install_linux
 
 
 ## Usage
+* ysab -h
+
 ```
 Options:
   -r  Rounds of request to run, total requests equal r * n
   -n  Number of multiple requests to make at a time, n>0 if n>900 n will be set to 900.
-  -m  HTTP method, one of GET, POST, PUT, DELETE. Default: GET
-  -u  Url of request, use " or ' please, if there are special symbols
+  -m  HTTP method, one of GET, POST, PUT, DELETE. Default GET
+  -u  Url of request, use " please
       For examples: 
-      -u "https://yunsonbai.top/?name='"
-      -u 'https://yunsonbai.top/?name="'
+      -u "https://yunsonbai.top/?name=yunson"
   -H  Add Arbitrary header line.
       For examples:
       -H "Accept: text/html". Set Accept to header.
       -H "Uid: yunson" -H "Content-Type: application/json". Set two fields to header.
-  -t  Timeout for each request in seconds. Default is 10s.
+  -t  Timeout for each request in seconds. Default 10s.
   -d  HTTP request body. 
       For examples:
       '{"a": "a"}'
@@ -42,6 +42,8 @@ Options:
       -urlfile /tmp/urls.txt
 ```
 
+* Note: -urlsfile is the key parameter for sending requests with different parameters. For details of the file, please refer to examples/post_urls.txt and examples/get_urls.txt
+
 ## Some examples
 * e1: ysab -n 900 -r 2 -u http://10.10.10.10:8080/test
 * e2: ysab -n 900 -urlsfile ./examples/get_urls.txt
@@ -51,6 +53,7 @@ Options:
 ## Result show
 ```
 (http://10.10.10.10:8080/test is API, it is writed by gin. The api will respone "hello world".)
+
 [yunson ~]# ysab -n 900 -r 30 -u http://10.10.10.10:8080/test
 
 Summary:
@@ -101,6 +104,7 @@ Response Time histogram (code: requests):
 * use -urlsfile
 ```
 You can use -urlsfile to send multiple requests with different body.
+
 cmd example:
 	ysab -n 500 -urlsfile ./examples/get_urls.txt
     ysab -n 500 -urlsfile -m POST ./examples/post_urls.txt
@@ -109,6 +113,7 @@ urls.txt example:
 	examples/urls.txt
 	You can use create_urls.py to create a urls.txt file.
 ```
+
 * use -u
 ```
 example:

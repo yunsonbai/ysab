@@ -1,6 +1,8 @@
 # !/bin/bash
+versionInfo=`curl https://github.com/yunsonbai/ysab/releases/latest`
+tmpV=${versionInfo#*tag/v}
+version=${tmpV%\"*}
 prefix='ysab_mac_'
-version='0.4.2'
 echo '------------------------------------------------'
 echo 'ysab: The version you will install is' $version
 echo '------------------------------------------------'
@@ -13,3 +15,4 @@ chmod +x ysab
 mv ysab /usr/local/bin/
 rm -rf $prefix$version.tgz
 source /etc/profile
+

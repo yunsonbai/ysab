@@ -6,42 +6,54 @@ ysab 是一个可以帮助你获取http服务器压力测试性能指标的工�
 [English](./README-ENGLISH.md)
 
 ## 安装
-* git clone git@github.com:yunsonbai/ysab.git
+* mac
 
-## Usage
+wget https://github.com/yunsonbai/ysab/releases/download/v0.4.2/install_mac && sh install_mac && rm -rf install_mac
+
+如果安装完后不能输入 ysab 命令，可以重启终端或者执行 source /etc/profile
+
+* linux
+
+wget https://github.com/yunsonbai/ysab/releases/download/v0.4.2/install_linux && sh ./install_linux && rm -rf ./install_linux
+
+## 参数说明
+* ysab -h
+
 ```
 Options:
-  -r  Rounds of request to run, total requests equal r * n
-  -n  Number of multiple requests to make at a time, n>0 if n>900 n will be set to 900.
-  -m  HTTP method, one of GET, POST, PUT, DELETE. Default: GET
-  -u  Url of request, use " or ' please, if there are special symbols
-      For examples: 
-      -u "https://yunsonbai.top/?name='"
-      -u 'https://yunsonbai.top/?name="'
-  -H  Add Arbitrary header line.
-      For examples:
-      -H "Accept: text/html". Set Accept to header.
-      -H "Uid: yunson" -H "Content-Type: application/json". Set two fields to header.
-  -t  Timeout for each request in seconds. Default is 10s.
-  -d  HTTP request body. 
-      For examples:
+  -r  压测轮数，总的请求量是 r * n
+  -n  并发数，最大900，最小1
+  -m  HTTP method, 可选值 GET, POST, PUT, DELETE。 默认GET
+  -u  Url of request, 使用 " 括起来
+      例如: 
+      -u "https://yunsonbai.top/?name=yunson"
+  -H  添加请求头
+      例如:
+      -H "Accept: text/html"  设置 Accept。
+      -H "Uid: yunson" -H "Content-Type: application/json" 设置Uid和Content-Type
+  -t  每个请求的超时时间，俺单位为秒。 默认10s
+  -d  请求体 
+      例如:
       '{"a": "a"}'
-  -h  This help
-  -v  Show verison
-  -urlsfile  The urls file path. If you set this Option, -u,-d,-r will be invalid.
-      For examples:
+  -h  帮助
+  -v  显示版本号
+  -urlsfile  包含所有请求信息的文件，如果设置了该参数, -u,-d,-r 将会失效
+      例如:
       -urlfile /tmp/urls.txt
 ```
 
-## Some examples
-* e1: ysab -n 900 -r 2 -u http://10.10.10.10:8080/test
-* e2: ysab -n 900 -urlsfile ./examples/get_urls.txt
-* e3: ysab -n 900 -r 2 -m POST -u http://10.10.10.10:8080/add -d '{"name": "yunson"}'
-* e4: ysab -n 900 -urlsfile -m POST ./examples/post_urls.txt
+* 注意: -urlsfile 是实现发送携带不同参数请求的关键参数，文件详细内容，可参照examples/post_urls.txt 和 examples/get_urls.txt
 
-## Result show
+## 一些例子
+* 1: ysab -n 900 -r 2 -u http://10.10.10.10:8080/test
+* 2: ysab -n 900 -urlsfile ./examples/get_urls.txt
+* 3: ysab -n 900 -r 2 -m POST -u http://10.10.10.10:8080/add -d '{"name": "yunson"}'
+* 4: ysab -n 900 -urlsfile -m POST ./examples/post_urls.txt
+
+## 结果展示
 ```
-(http://10.10.10.10:8080/test is API, it is writed by gin. The api will respone "hello world".)
+(http://10.10.10.10:8080/test 是一个借助gin完成的测试 API. 这个 API 的 response 是 "hello world".)
+
 [yunson ~]# ysab -n 900 -r 30 -u http://10.10.10.10:8080/test
 
 Summary:
@@ -80,7 +92,7 @@ Response Time histogram (code: requests):
   429:		2550
 ```
 
-## about http code
+## 关于 http code
 * 2xx: Success
 * != 2xx: Faild
     * 5xx:
@@ -88,11 +100,12 @@ Response Time histogram (code: requests):
         * 503: May be connection refused or connection reset by peer, you need to check your server.
     * other: [http code](https://en.wikipedia.org/wiki/List_of_HTTP_status_codes)
 
-## Note
-* use -urlsfile
+## 注意
+* 推荐使用 -urlsfile
 ```
-You can use -urlsfile to send multiple requests with different body.
-cmd example:
+你可以使用 -urlsfile 发送携带不同 body 或 url 的请求
+
+样例:
 	ysab -n 500 -urlsfile ./examples/get_urls.txt
     ysab -n 500 -urlsfile -m POST ./examples/post_urls.txt
 
@@ -100,7 +113,9 @@ urls.txt example:
 	examples/urls.txt
 	You can use create_urls.py to create a urls.txt file.
 ```
+
 * use -u
+
 ```
 example:
     ysab -n 900 -r 30 -u "http://10.121.130.218:8080/test"

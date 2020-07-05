@@ -124,7 +124,7 @@ example:
 
 ```
 
-## Acknowledgements
+## 鸣谢
 * [Jason-Liu-Dream](https://github.com/Jason-Liu-Dream)
 * [zbing3](https://github.com/zbing3)
 

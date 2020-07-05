@@ -8,13 +8,13 @@ ysab 是一个可以帮助你获取http服务器压力测试性能指标的工�
 ## 安装
 * mac
 
-wget https://github.com/yunsonbai/ysab/releases/download/v0.4.2/install_mac && sh install_mac && rm -rf install_mac
+wget https://github.com/yunsonbai/ysab/releases/download/install-tool/install_mac && sh install_mac && rm -rf install_mac
 
 如果安装完后不能输入 ysab 命令，可以重启终端或者执行 source /etc/profile
 
 * linux
 
-wget https://github.com/yunsonbai/ysab/releases/download/v0.4.2/install_linux && sh ./install_linux && rm -rf ./install_linux
+wget https://github.com/yunsonbai/ysab/releases/download/install-tool/install_linux && sh ./install_linux && rm -rf ./install_linux
 
 ## 参数说明
 * ysab -h
@@ -23,7 +23,7 @@ wget https://github.com/yunsonbai/ysab/releases/download/v0.4.2/install_linux &&
 Options:
   -r  压测轮数，总的请求量是 r * n
   -n  并发数，最大900，最小1
-  -m  HTTP method, 可选值 GET, POST, PUT, DELETE。 默认GET
+  -m  HTTP method, 可选值 GET，POST，PUT，DELETE，Head。 默认GET
   -u  Url of request, 使用 " 括起来
       例如: 
       -u "https://yunsonbai.top/?name=yunson"
@@ -127,4 +127,3 @@ example:
 ## 鸣谢
 * [Jason-Liu-Dream](https://github.com/Jason-Liu-Dream)
 * [zbing3](https://github.com/zbing3)
-

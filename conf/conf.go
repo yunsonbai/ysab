@@ -16,10 +16,9 @@ var usage = `Usage: ysab [Options]
 Options:
   -r  Rounds of request to run, total requests equal r * n
   -n  Number of multiple requests to make at a time, n>0 if n>900 n will be set to 900.
-  -m  HTTP method, one of GET, POST, PUT, DELETE. Default: GET
-  -u  Url of request, use " or ' please, if there are special symbols
+  -m  HTTP method, one of GET, POST, PUT, DELETE, Head. Default: GET
+  -u  Url of request, use " please.
       For examples: 
-      -u "https://yunsonbai.top/?name='"
       -u 'https://yunsonbai.top/?name="'
   -H  Add Arbitrary header line.
       For examples:

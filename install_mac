@@ -12,7 +12,7 @@ wget https://github.com/yunsonbai/ysab/releases/download/v$version/$prefix$versi
 tar -zxvf $prefix$version.tgz
 mv $prefix$version ysab
 chmod +x ysab
+rm -f /usr/local/bin/ysab
 mv ysab /usr/local/bin/
 rm -rf $prefix$version.tgz
 source /etc/profile
-

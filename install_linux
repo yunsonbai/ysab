@@ -8,7 +8,7 @@ echo 'ysab: The version you will install is' $version
 echo '------------------------------------------------'
 sleep 2
 rm -rf $prefix$version.tgz
-wget https://github.com/yunsonbai/ysab/releases/download/v$version/$prefix$version.tgz
+wget https://github.com/yunsonbai/ysab/releases/download/v$version/$prefix$version.tgz -O $prefix$version.tgz
 tar -zxvf $prefix$version.tgz
 mv $prefix$version ysab
 chmod +x ysab

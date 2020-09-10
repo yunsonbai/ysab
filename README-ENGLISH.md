@@ -7,13 +7,13 @@ It can help you send requests with different parameters, so you can easily repla
 ## Installation
 * mac
 
-wget https://github.com/yunsonbai/ysab/releases/download/install-tool/install_mac && sh install_mac && rm -rf install_mac
+wget https://github.com/yunsonbai/ysab/releases/download/install-tool/install_mac -O install_mac && sh install_mac && rm -rf install_mac
 
 If you cannot enter the ysab command after installation, you can restart the terminal or execute source /etc/profile.
 
 * linux
 
-wget https://github.com/yunsonbai/ysab/releases/download/install-tool/install_linux && sh ./install_linux && rm -rf ./install_linux
+wget https://github.com/yunsonbai/ysab/releases/download/install-tool/install_linux -O install_linux && sh install_linux && rm -rf install_linux
 
 
 ## Usage

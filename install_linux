@@ -2,7 +2,7 @@
 versionInfo=`curl https://github.com/yunsonbai/ysab/releases/latest`
 tmpV=${versionInfo#*tag/v}
 version=${tmpV%\"*}
-prefix='ysab_linux_'
+prefix='ysab-linux-'
 echo '------------------------------------------------'
 echo 'ysab: The version you will install is' $version
 echo '------------------------------------------------'

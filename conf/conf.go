@@ -56,7 +56,6 @@ var (
 		Headers: make(map[string]string),
 	}
 	fbr     *bufio.Reader
-	VERSION = "version is 0.4.4"
 	headers headersSlice
 )
 
@@ -110,7 +109,7 @@ func arrangeOptions() {
 		os.Exit(0)
 	}
 	if *version {
-		fmt.Println(VERSION)
+		fmt.Println("version is", VERSION)
 		os.Exit(0)
 	}
 	methoderr := "(-m) method not allowed."

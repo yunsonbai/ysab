@@ -56,7 +56,7 @@ var (
 		Headers: make(map[string]string),
 	}
 	fbr     *bufio.Reader
-	VERSION = "version is 0.4.2"
+	VERSION = "version is 0.4.4"
 	headers headersSlice
 )
 

@@ -37,7 +37,7 @@ Options:
       例如:
       -H "Accept: text/html"  设置 Accept。
       -H "Uid: yunson" -H "Content-Type: application/json" 设置Uid和Content-Type
-  -t  每个请求的超时时间，俺单位为秒。 默认10s
+  -t  每个请求的超时时间，单位为秒。 默认10s
   -d  请求体 
       例如:
       '{"a": "a"}'

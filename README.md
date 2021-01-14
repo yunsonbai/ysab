@@ -54,7 +54,7 @@ Options:
 * 1: ysab -n 900 -r 2 -u http://10.10.10.10:8080/test
 * 2: ysab -n 900 -urlsfile ./examples/get_urls.txt
 * 3: ysab -n 900 -r 2 -m POST -u http://10.10.10.10:8080/add -d '{"name": "yunson"}'
-* 4: ysab -n 900 -urlsfile -m POST ./examples/post_urls.txt
+* 4: ysab -n 900 -m POST -urlsfile ./examples/post_urls.txt
 
 ## 结果展示
 ```
@@ -113,7 +113,7 @@ Response Time histogram (code: requests):
 
 样例:
 	ysab -n 500 -urlsfile ./examples/get_urls.txt
-    ysab -n 500 -urlsfile -m POST ./examples/post_urls.txt
+    ysab -n 500 -m POST -urlsfile ./examples/post_urls.txt
 
 urls.txt example:
 	examples/urls.txt

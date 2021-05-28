@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"io"
 	"io/ioutil"
+	"math/rand"
 	"net/http"
 	"net/http/httptrace"
 	netulr "net/url"
@@ -13,23 +14,26 @@ import (
 	"ysab/tools"
 )
 
-var (
-	httpClient *http.Client
-	config     = conf.Conf
+const (
+	clientsN int = 2
 )
 
-const (
-	MaxIdleConnections int = 1000
+var (
+	HttpClients []*http.Client
+	config      = conf.Conf
 )
 
 func init() {
-	httpClient = creteHttpClient()
+	for i := 0; i < clientsN; i++ {
+		HttpClients = append(HttpClients, creteHttpClient())
+	}
 }
 
 func creteHttpClient() *http.Client {
 	client := &http.Client{
 		Transport: &http.Transport{
-			MaxIdleConnsPerHost: MaxIdleConnections,
+			MaxConnsPerHost:     config.N/clientsN + 128,
+			MaxIdleConnsPerHost: config.N/clientsN + 128,
 			DisableKeepAlives:   false,
 			DisableCompression:  false,
 		},
@@ -38,7 +42,7 @@ func creteHttpClient() *http.Client {
 	return client
 }
 
-func do(url string, method string, headers map[string]string, bodydata string) summary.Res {
+func do(url, method, bodydata string, headers map[string]string) summary.Res {
 	var code int
 	var size, tmpt int64
 	var dnsStart, connStart, respStart, reqStart, delayStart int64
@@ -47,10 +51,10 @@ func do(url string, method string, headers map[string]string, bodydata string) s
 	if err != nil {
 		return summary.Res{}
 	}
-	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "*/*")
 	req.Header.Set("Connection", "keep-alive")
-	req.Header.Set("Accept-Encoding", "gzip, deflate")
+	// req.Header.Set("Accept-Encoding", "gzip, deflate")
+
 	for k, v := range headers {
 		req.Header.Set(k, v)
 	}
@@ -84,7 +88,10 @@ func do(url string, method string, headers map[string]string, bodydata string) s
 	}
 	req = req.WithContext(httptrace.WithClientTrace(req.Context(), trace))
 	tStart := tools.GetNowUnixNano()
-	response, err := httpClient.Do(req)
+
+	client := HttpClients[rand.Intn(clientsN)]
+	response, err := client.Do(req)
+
 	tEnd := tools.Now()
 	if response != nil {
 		if response.ContentLength > -1 {
@@ -93,7 +100,16 @@ func do(url string, method string, headers map[string]string, bodydata string) s
 			size = 0
 		}
 		code = response.StatusCode
-		io.Copy(ioutil.Discard, response.Body)
+		bSize := 32 * 1024
+		if int64(bSize) > size {
+			if size < 1 {
+				bSize = 1
+			} else {
+				bSize = int(size)
+			}
+		}
+		buf := make([]byte, bSize)
+		io.CopyBuffer(ioutil.Discard, response.Body, buf)
 		response.Body.Close()
 	} else {
 		code = 503
@@ -105,6 +121,7 @@ func do(url string, method string, headers map[string]string, bodydata string) s
 	}
 
 	respDuration = tEnd.UnixNano() - respStart
+
 	return summary.Res{
 		Size:         int(size),
 		TimeStamp:    int(tEnd.UnixNano()),
@@ -119,19 +136,19 @@ func do(url string, method string, headers map[string]string, bodydata string) s
 
 }
 
-func Head(url string, headers map[string]string, data string) summary.Res {
-	return do(url, "HEAD", headers, data)
+func Head(url, data string, headers map[string]string) summary.Res {
+	return do(url, "HEAD", data, headers)
 }
 
-func Get(url string, headers map[string]string, data string) summary.Res {
-	return do(url, "GET", headers, data)
+func Get(url, data string, headers map[string]string) summary.Res {
+	return do(url, "GET", data, headers)
 }
-func Post(url string, headers map[string]string, data string) summary.Res {
-	return do(url, "POST", headers, data)
+func Post(url, data string, headers map[string]string) summary.Res {
+	return do(url, "POST", data, headers)
 }
-func Put(url string, headers map[string]string, data string) summary.Res {
-	return do(url, "PUT", headers, data)
+func Put(url, data string, headers map[string]string) summary.Res {
+	return do(url, "PUT", data, headers)
 }
-func Delete(url string, headers map[string]string, data string) summary.Res {
-	return do(url, "DELETE", headers, data)
+func Delete(url, data string, headers map[string]string) summary.Res {
+	return do(url, "DELETE", data, headers)
 }

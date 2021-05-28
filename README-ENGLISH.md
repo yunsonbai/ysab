@@ -27,16 +27,16 @@ wget https://github.com/yunsonbai/ysab/releases/download/install-tool/install_li
 ```
 Options:
   -r  Rounds of request to run, total requests equal r * n
-  -n  Number of multiple requests to make at a time, n>0 if n>900 n will be set to 900.
-  -m  HTTP method, one of GET, POST, PUT, DELETE, Head. Default GET
-  -u  Url of request, use " please
+  -n  Number of simultaneous requests, 0<n<=900, depends on machine performance.
+  -m  HTTP method, one of GET, POST, PUT, DELETE, Head. Default: GET
+  -u  Url of request, use " please.
       For examples: 
-      -u "https://yunsonbai.top/?name=yunson"
+      -u 'https://yunsonbai.top/?name=yunson'
   -H  Add Arbitrary header line.
       For examples:
       -H "Accept: text/html". Set Accept to header.
       -H "Uid: yunson" -H "Content-Type: application/json". Set two fields to header.
-  -t  Timeout for each request in seconds. Default 10s.
+  -t  Timeout for each request in seconds. Default is 10s.
   -d  HTTP request body. 
       For examples:
       '{"a": "a"}'

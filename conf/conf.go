@@ -15,11 +15,11 @@ var usage = `Usage: ysab [Options]
 
 Options:
   -r  Rounds of request to run, total requests equal r * n
-  -n  Number of multiple requests to make at a time, n>0 if n>900 n will be set to 900.
+  -n  Number of simultaneous requests, 0<n<=900, depends on machine performance.
   -m  HTTP method, one of GET, POST, PUT, DELETE, Head. Default: GET
   -u  Url of request, use " please.
       For examples: 
-      -u 'https://yunsonbai.top/?name="'
+      -u 'https://yunsonbai.top/?name=yunson'
   -H  Add Arbitrary header line.
       For examples:
       -H "Accept: text/html". Set Accept to header.
@@ -36,9 +36,9 @@ Options:
 `
 
 type Config struct {
-	Round       int    // 总的请求数, 当且仅当UseOneUrl有效时该字段有效
-	N           int    // 每次执行的数量
-	Url         string // 需要请求的url, 当且仅当UseOneUrl有效时该字段有效
+	Round       int    // 请求多少轮, 只对Url有效
+	N           int    // 并发数
+	Url         string // 需要请求的url, 与UrlFilePath只能一个有效
 	UrlFilePath string //url文件路径
 	UrlNum      int
 	Headers     map[string]string

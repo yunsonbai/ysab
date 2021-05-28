@@ -15,7 +15,7 @@ import (
 var (
 	rwg       sync.WaitGroup
 	config    = conf.Conf
-	urlChanel = make(chan [2]string, 30000)
+	urlChanel = make(chan [2]string, 20000)
 )
 
 func worker(method string) {

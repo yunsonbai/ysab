@@ -8,7 +8,8 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"ysab/tools"
+
+	"github.com/yunsonbai/ysab/tools"
 )
 
 var usage = `Usage: ysab [Options]

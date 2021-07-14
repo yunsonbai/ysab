@@ -6,10 +6,11 @@ import (
 	"os"
 	"sync"
 	"time"
-	"ysab/conf"
-	yshttp "ysab/http"
-	"ysab/summary"
-	ystools "ysab/tools"
+
+	"github.com/yunsonbai/ysab/conf"
+	yshttp "github.com/yunsonbai/ysab/http"
+	"github.com/yunsonbai/ysab/summary"
+	ystools "github.com/yunsonbai/ysab/tools"
 )
 
 var (

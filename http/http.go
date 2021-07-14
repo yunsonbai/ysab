@@ -9,9 +9,10 @@ import (
 	"net/http/httptrace"
 	netulr "net/url"
 	"time"
-	"ysab/conf"
-	"ysab/summary"
-	"ysab/tools"
+
+	"github.com/yunsonbai/ysab/conf"
+	"github.com/yunsonbai/ysab/summary"
+	"github.com/yunsonbai/ysab/tools"
 )
 
 const (

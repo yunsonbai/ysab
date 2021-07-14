@@ -1,7 +1,7 @@
 package main
 
 import (
-	"ysab/worker"
+	"github.com/yunsonbai/ysab/worker"
 )
 
 func main() {

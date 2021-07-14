@@ -5,8 +5,9 @@ import (
 	"sort"
 	"strconv"
 	"sync"
-	"ysab/conf"
-	"ysab/tools"
+
+	"github.com/yunsonbai/ysab/conf"
+	"github.com/yunsonbai/ysab/tools"
 )
 
 var (

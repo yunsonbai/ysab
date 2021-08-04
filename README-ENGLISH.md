@@ -35,6 +35,7 @@ Options:
   -H  Add Arbitrary header line.
       For examples:
       -H "Accept: text/html". Set Accept to header.
+      -H "Host: yunsonbai.top". Set Host to header.
       -H "Uid: yunson" -H "Content-Type: application/json". Set two fields to header.
   -t  Timeout for each request in seconds. Default is 10s.
   -d  HTTP request body. 

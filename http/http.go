@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/http/httptrace"
 	netulr "net/url"
+	"strings"
 	"time"
 
 	"github.com/yunsonbai/ysab/conf"
@@ -54,11 +55,15 @@ func do(url, method, bodydata string, headers map[string]string) summary.Res {
 	}
 	req.Header.Set("Accept", "*/*")
 	req.Header.Set("Connection", "keep-alive")
-	// req.Header.Set("Accept-Encoding", "gzip, deflate")
-
+	req.Header.Set("Accept-Encoding", "gzip, deflate")
 	for k, v := range headers {
-		req.Header.Set(k, v)
+		if strings.ToLower(k) == "host" {
+			req.Host = v
+		} else {
+			req.Header.Set(k, v)
+		}
 	}
+
 	trace := &httptrace.ClientTrace{
 		DNSStart: func(info httptrace.DNSStartInfo) {
 			dnsStart = tools.GetNowUnixNano()

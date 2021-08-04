@@ -16,17 +16,18 @@ var usage = `Usage: ysab [Options]
 
 Options:
   -r  Rounds of request to run, total requests equal r * n
-  -n  Number of simultaneous requests, 0<n<=900, depends on machine performance.
+  -n  Number of simultaneous requests, 0<n<=900, depends on machine performance
   -m  HTTP method, one of GET, POST, PUT, DELETE, Head. Default: GET
-  -u  Url of request, use " please.
+  -u  Url of request, use " please
       For examples: 
       -u 'https://yunsonbai.top/?name=yunson'
-  -H  Add Arbitrary header line.
+  -H  Add Arbitrary header line
       For examples:
-      -H "Accept: text/html". Set Accept to header.
-      -H "Uid: yunson" -H "Content-Type: application/json". Set two fields to header.
-  -t  Timeout for each request in seconds. Default is 10s.
-  -d  HTTP request body. 
+      -H "Accept: text/html". Set Accept to header
+      -H "Host: yunsonbai.top". Set Host to header
+      -H "Uid: yunson" -H "Content-Type: application/json". Set two fields to header
+  -t  Timeout for each request in seconds. Default is 10s
+  -d  HTTP request body
       For examples:
       '{"a": "a"}'
   -h  This help

@@ -1,7 +1,13 @@
 # Change Log
 
+## v1.0.1
+2021-0804
+
+### Changed
+1. Allow setting Host in header
+
 ## v1.0.0
-2021-05028
+2021-0528
 
 ### Changed
 1. More stable performance

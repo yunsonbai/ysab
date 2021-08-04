@@ -29,16 +29,16 @@ wget https://github.com/yunsonbai/ysab/releases/download/install-tool/install_li
 Options:
   -r  压测轮数，总的请求量是 r * n
   -n  并发数，最大900，最小1
-  -m  HTTP method, 可选值 GET，POST，PUT，DELETE，Head。 默认GET
+  -m  HTTP method, 可选值 GET，POST，PUT，DELETE，Head，默认GET
   -u  Url of request, 使用 " 括起来
       例如: 
       -u "https://yunsonbai.top/?name=yunson"
   -H  添加请求头
       例如:
       -H "Accept: text/html"  设置 Accept
-      -H "Host: yunsonbai.top". 设置 Host
+      -H "Host: yunsonbai.top"  设置 Host
       -H "Uid: yunson" -H "Content-Type: application/json" 设置Uid和Content-Type
-  -t  每个请求的超时时间，单位为秒。 默认10s
+  -t  每个请求的超时时间，单位为秒，默认10s
   -d  请求体 
       例如:
       '{"a": "a"}'

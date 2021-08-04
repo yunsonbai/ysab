@@ -17,23 +17,23 @@ var usage = `Usage: ysab [Options]
 Options:
   -r  Rounds of request to run, total requests equal r * n
   -n  Number of simultaneous requests, 0<n<=900, depends on machine performance
-  -m  HTTP method, one of GET, POST, PUT, DELETE, Head. Default: GET
+  -m  HTTP method, one of GET, POST, PUT, DELETE, Head, Default GET
   -u  Url of request, use " please
-      For examples: 
+      eg: 
       -u 'https://yunsonbai.top/?name=yunson'
   -H  Add Arbitrary header line
-      For examples:
-      -H "Accept: text/html". Set Accept to header
-      -H "Host: yunsonbai.top". Set Host to header
-      -H "Uid: yunson" -H "Content-Type: application/json". Set two fields to header
-  -t  Timeout for each request in seconds. Default is 10s
+      eg:
+      -H "Accept: text/html", Set Accept to header
+      -H "Host: yunsonbai.top", Set Host to header
+      -H "Uid: yunson" -H "Content-Type: application/json", Set two fields to header
+  -t  Timeout for each request in seconds, Default 10
   -d  HTTP request body
-      For examples:
+      eg:
       '{"a": "a"}'
   -h  This help
   -v  Show verison
-  -urlsfile  The urls file path. If you set this Option, -u,-d,-r will be invalid.
-      For examples:
+  -urlsfile  The urls file path. If you set this Option, -u,-d,-r will be invalid
+      eg:
       -urlfile /tmp/urls.txt
 `
 

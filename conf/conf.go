@@ -98,9 +98,9 @@ func arrangeOptions() {
 	m := flag.String("m", "GET", "")
 	flag.Var(&headers, "H", "")
 	body := flag.String("d", "", "")
-	round := flag.Int("r", 1, "")
+	round := flag.Int("r", 0, "")
 	version := flag.Bool("v", false, "")
-	n := flag.Int("n", 100, "")
+	n := flag.Int("n", 0, "")
 	url := flag.String("u", "", "")
 	timeout := flag.Int("t", 10, "")
 	urlsfile := flag.String("urlsfile", "", "")
@@ -134,14 +134,14 @@ func arrangeOptions() {
 		Conf.Headers[headers[1]] = headers[2]
 	}
 	Conf.Body = *body
-	if *round <= 0 {
-		confError(errors.New("(-r) Round must be greater than 0."))
-	}
-	Conf.Round = *round
 	if *n <= 0 {
 		confError(errors.New("(-n) Number must be greater than 0."))
 	}
 	Conf.N = *n
+	if *round <= 0 {
+		confError(errors.New("(-r) Round must be greater than 0."))
+	}
+	Conf.Round = *round
 	Conf.Url = *url
 	if *timeout <= 0 {
 		confError(errors.New("(-t) timeout must be greater than 0."))

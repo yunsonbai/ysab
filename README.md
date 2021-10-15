@@ -1,7 +1,7 @@
 
 ![ysab](https://github.com/yunsonbai/ysab/blob/master/ysab2.jpeg)
 
-ysab 是一个可以帮助你获取http服务器压力测试性能指标的工具，有点像Apache的ab。不同的是，它可以帮你发送携带不同参数的请求，这样你就可以便捷地重放线上的真实请求。
+ysab 是一个可以帮助你获取http服务器压力测试性能指标的工具，有点像Apache的ab，不同的是，它可以帮你发送携带不同参数的请求，这样你就可以便捷地重放线上的真实请求。
 
 [English](./README-ENGLISH.md)
 

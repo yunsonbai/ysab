@@ -1,5 +1,13 @@
 # Change Log
 
+## v1.1.0
+2022-0425
+
+### Changed
+1. Use fasthttp, faster and less resource.
+2. Add Options -F, Use express mode ([0]/1). Select 1, qps may be higher, but Time detail cannot be counted
+3. If use -F 1, Faster, increase by about 50% (be based on: ysab -n 500 -r 1500 ...)
+
 ## v1.0.1
 2021-0804
 

@@ -11,7 +11,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/yunsonbai/ysab/conf"
 	"github.com/yunsonbai/ysab/summary"
 	"github.com/yunsonbai/ysab/tools"
 )
@@ -22,7 +21,6 @@ const (
 
 var (
 	HttpClients []*http.Client
-	config      = conf.Conf
 )
 
 func init() {
@@ -34,8 +32,8 @@ func init() {
 func creteHttpClient() *http.Client {
 	client := &http.Client{
 		Transport: &http.Transport{
-			MaxConnsPerHost:     config.N/clientsN + 128,
-			MaxIdleConnsPerHost: config.N/clientsN + 128,
+			MaxConnsPerHost:     config.N/clientsN + 8,
+			MaxIdleConnsPerHost: config.N/clientsN + 8,
 			DisableKeepAlives:   false,
 			DisableCompression:  false,
 		},
@@ -95,8 +93,8 @@ func do(url, method, bodydata string, headers map[string]string) summary.Res {
 	req = req.WithContext(httptrace.WithClientTrace(req.Context(), trace))
 	tStart := tools.GetNowUnixNano()
 
-	client := HttpClients[rand.Intn(clientsN)]
-	response, err := client.Do(req)
+	// client := HttpClients[rand.Intn(clientsN)]
+	response, err := HttpClients[rand.Intn(clientsN)].Do(req)
 
 	tEnd := tools.Now()
 	if response != nil {
@@ -106,16 +104,15 @@ func do(url, method, bodydata string, headers map[string]string) summary.Res {
 			size = 0
 		}
 		code = response.StatusCode
-		bSize := 32 * 1024
-		if int64(bSize) > size {
+		bSize := 32768 // 32 * 1024
+		if size < 32768 {
 			if size < 1 {
 				bSize = 1
 			} else {
 				bSize = int(size)
 			}
 		}
-		buf := make([]byte, bSize)
-		io.CopyBuffer(ioutil.Discard, response.Body, buf)
+		io.CopyBuffer(ioutil.Discard, response.Body, make([]byte, bSize))
 		response.Body.Close()
 	} else {
 		code = 503
@@ -129,32 +126,15 @@ func do(url, method, bodydata string, headers map[string]string) summary.Res {
 	respDuration = tEnd.UnixNano() - respStart
 
 	return summary.Res{
-		Size:         int(size),
-		TimeStamp:    int(tEnd.UnixNano()),
-		TotalUseTime: float64((tEnd.UnixNano() - tStart) / 10e5),
+		Size:         size,
+		TimeStamp:    tEnd.UnixNano(),
+		TotalUseTime: (tEnd.UnixNano() - tStart),
 		Code:         code,
-		ConnTime:     float64(connDuration / 10e5),
-		DNSTime:      float64(dnsDuration / 10e5),
-		ReqTime:      float64(reqDuration / 10e5),
-		DelayTime:    float64(delayDuration / 10e5),
-		ResTime:      float64(respDuration / 10e5),
+		ConnTime:     connDuration,
+		DNSTime:      dnsDuration,
+		ReqTime:      reqDuration,
+		DelayTime:    delayDuration,
+		ResTime:      respDuration,
 	}
 
-}
-
-func Head(url, data string, headers map[string]string) summary.Res {
-	return do(url, "HEAD", data, headers)
-}
-
-func Get(url, data string, headers map[string]string) summary.Res {
-	return do(url, "GET", data, headers)
-}
-func Post(url, data string, headers map[string]string) summary.Res {
-	return do(url, "POST", data, headers)
-}
-func Put(url, data string, headers map[string]string) summary.Res {
-	return do(url, "PUT", data, headers)
-}
-func Delete(url, data string, headers map[string]string) summary.Res {
-	return do(url, "DELETE", data, headers)
 }

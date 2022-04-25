@@ -19,28 +19,14 @@ var (
 	urlChanel = make(chan [2]string, 30000)
 )
 
-func worker(method string) {
-	wf := yshttp.Get
-	switch method {
-	case "GET":
-		wf = yshttp.Get
-	case "POST":
-		wf = yshttp.Post
-	case "PUT":
-		wf = yshttp.Post
-	case "DELETE":
-		wf = yshttp.Post
-	case "HEAD":
-		wf = yshttp.Head
-	default:
-		return
-	}
+func worker(method string, fast int) {
 	for {
 		data, ok := <-urlChanel
 		if !ok {
 			return
 		}
-		summary.ResChanel <- wf(data[0], data[1], config.Headers)
+		summary.ResChanel <- yshttp.Request(
+			data[0], data[1], method, config.Headers, fast)
 	}
 }
 
@@ -62,17 +48,17 @@ func addTask() {
 			if err == io.EOF {
 				done = 1
 			}
-			reqData := ystools.GetReqData(string(line))
-			url = reqData.Url
-			body = reqData.Body
+			url, body = ystools.GetReqDataNew(string(line))
+			// reqData := ystools.GetReqData(string(line))
+			// url = reqData.Url
+			// body = reqData.Body
 		} else {
 			if i == config.UrlNum {
 				done = 1
 			}
 		}
 		if url != "" {
-			data := [2]string{url, body}
-			urlChanel <- data
+			urlChanel <- [2]string{url, body}
 		}
 		if done == 1 {
 			break
@@ -80,7 +66,7 @@ func addTask() {
 	}
 	if done == 1 {
 		for {
-			time.Sleep(time.Duration(50) * time.Millisecond)
+			time.Sleep(time.Duration(200) * time.Millisecond)
 			if len(urlChanel) == 0 {
 				close(urlChanel)
 				return
@@ -98,7 +84,7 @@ func StartWork() {
 	}()
 	for index := 0; index < config.N; index++ {
 		go func() {
-			worker(config.Method)
+			worker(config.Method, config.Fast)
 		}()
 	}
 	rwg.Wait()

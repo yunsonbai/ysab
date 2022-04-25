@@ -50,6 +50,21 @@ func GetReqData(str string) ReqData {
 	return reqData
 }
 
+func GetReqDataNew(str string) (url, body string) {
+	if str == "" {
+		return url, body
+	}
+	dataMap := ParseStr(str)
+	for k, v := range dataMap {
+		if k == "-u" {
+			url = v
+		} else if k == "-d" {
+			body = v
+		}
+	}
+	return url, body
+}
+
 // 替换所有的引号
 func ReplaceQmarks(str string, new string) string {
 	return string(replaceSpaceRegexp.ReplaceAll([]byte(str), []byte("")))

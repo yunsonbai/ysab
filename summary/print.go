@@ -13,7 +13,7 @@ var (
 Summary:
   Complete requests:		{{ .CompleteRequests }}
   Failed requests:		{{ .FailedRequests }}
-  Time taken (s):		{{ .TimeToken }}
+  Time taken (s):		{{ .TimeTaken }}
   Total data size (Byte):	{{ .TotalDataSize }}
   Data size/request (Byte):	{{ .AvgDataSize }}
   Max use time (ms):		{{.MaxUseTime}}
@@ -22,7 +22,7 @@ Summary:
   Requests/sec:			{{ .RequestsPerSec }}
   SuccessRequests/sec:		{{ .SuccessRequestsPerSec }}
 
-Percentage of waiting time (ms):
+Percentage of the requests served within a certain time (ms):
 {{ formatMap .WaitingTimeDetail }}
 
 Time detail (ms)

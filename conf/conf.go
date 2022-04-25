@@ -31,6 +31,7 @@ Options:
       eg:
       '{"a": "a"}'
   -h  This help
+  -F  Use express mode ([0]/1). Select 1, qps may be higher, but Time detail cannot be counted
   -v  Show verison
   -urlsfile  The urls file path. If you set this Option, -u,-d,-r will be invalid
       eg:
@@ -46,9 +47,10 @@ type Config struct {
 	Headers     map[string]string
 	TimeOut     int    //单次请求超时时间
 	Method      string // 请求方法
+	Fast        int
 	Body        string
-	StartTime   int
-	EndTime     int
+	StartTime   int64
+	EndTime     int64
 }
 
 type headersSlice []string
@@ -99,6 +101,7 @@ func arrangeOptions() {
 	flag.Var(&headers, "H", "")
 	body := flag.String("d", "", "")
 	round := flag.Int("r", 0, "")
+	fast := flag.Int("F", 0, "")
 	version := flag.Bool("v", false, "")
 	n := flag.Int("n", 0, "")
 	url := flag.String("u", "", "")
@@ -147,6 +150,10 @@ func arrangeOptions() {
 		confError(errors.New("(-t) timeout must be greater than 0."))
 	}
 	Conf.TimeOut = *timeout
+	if *fast < 0 || *fast > 1 {
+		confError(errors.New("(-F) must be 0 or 1."))
+	}
+	Conf.Fast = *fast
 	if *url == "" && *urlsfile == "" {
 		confError(errors.New("-u or -urlsfile must choice one."))
 	}
@@ -182,5 +189,5 @@ func init() {
 	if Conf.TimeOut <= 0 || Conf.TimeOut > 60 {
 		Conf.TimeOut = 60
 	}
-	Conf.StartTime = int(tools.GetNowUnixNano())
+	Conf.StartTime = tools.GetNowUnixNano()
 }

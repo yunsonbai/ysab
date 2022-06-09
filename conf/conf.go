@@ -19,23 +19,23 @@ Options:
   -n  Number of simultaneous requests, 0<n<=900, depends on machine performance
   -m  HTTP method, one of GET, POST, PUT, DELETE, Head, Default is GET
   -u  Url of request, use " please
-      eg: 
-      -u 'https://yunsonbai.top/?name=yunson'
+    eg: 
+	-u 'https://yunsonbai.top/?name=yunson'
   -H  Add Arbitrary header line
-      eg:
-      -H "Accept: text/html", Set Accept to header
-      -H "Host: yunsonbai.top", Set Host to header
-      -H "Uid: yunson" -H "Content-Type: application/json", Set two fields to header
+    eg:
+	-H "Accept: text/html", Set Accept to header
+	-H "Host: yunsonbai.top", Set Host to header
+	-H "Uid: yunson" -H "Content-Type: application/json", Set two fields to header
   -t  Timeout for each request in seconds, Default is 10
   -d  HTTP request body
-      eg:
-      '{"a": "a"}'
+    eg:
+	'{"a": "a"}'
+  -F  Faster request ([0]/1). Select 1 faster request, but time detail cannot be counted
   -h  This help
-  -F  Use express mode ([0]/1). Select 1, qps may be higher, but Time detail cannot be counted
   -v  Show verison
   -urlsfile  The urls file path. If you set this Option, -u,-d,-r will be invalid
-      eg:
-      -urlfile /tmp/urls.txt
+    eg:
+	-urlfile /tmp/urls.txt
 `
 
 type Config struct {

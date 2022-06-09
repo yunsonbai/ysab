@@ -43,6 +43,7 @@ Options:
       '{"a": "a"}'
   -h  This help
   -v  Show verison
+  -F  Faster request ([0]/1). Select 1 faster request, but time detail cannot be counted
   -urlsfile  The urls file path. If you set this Option, -u,-d,-r will be invalid
       eg:
       -urlfile /tmp/urls.txt

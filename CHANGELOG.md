@@ -5,7 +5,7 @@
 
 ### Changed
 1. Use fasthttp, faster and less resource.
-2. Add Options -F, Use express mode ([0]/1). Select 1, qps may be higher, but Time detail cannot be counted
+2. Add Options -F  Faster request ([0]/1). Select 1 faster request, but time detail cannot be counted
 3. If use -F 1, Faster, increase by about 50% (be based on: ysab -n 500 -r 1500 ...)
 
 ## v1.0.1

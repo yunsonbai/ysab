@@ -1,40 +1,13 @@
-#!/bin/bash
-# 该脚本打包使用
+# !/bin/bash
+VERSION=`cat ./conf/version.go|grep 'VERSION'|awk -F = {'print $2'}|awk -F \" {'print $2'}`
+echo build $VERSION
+NAME=ysab
+go build -o $NAME
+mv $NAME $NAME-mac-v$VERSION
+tar -zcvf $NAME-mac-v$VERSION.tgz $NAME-mac-v$VERSION
+rm -rf $NAME-mac-v$VERSION
 
-platform=$1
-
-verssion=`grep -rnw 'VERSION' ./conf/version.go | awk -F '"' '{print $2}'`
-app=ysab-$platform-$verssion
-package=$app.tgz
-
-echo ""
-echo "you will build $app"
-
-sleep 2
-
-
-case $platform in
-    linux)
-        env GOOS=linux go build -o $app
-        ;;
-    mac)
-        go build -o $app
-        ;;
-    *)
-      echo "请使用:"
-      echo "    ./build.sh linux"
-      echo "    or"
-      echo "    ./build.sh mac"
-      echo "  "
-      exit 1
-      ;;
-esac
-
-echo "you will get $package"
-
-tar -zcvf $package $app
-rm $app
-
-echo "success"
-echo ""
-exit 0
+env GOOS=linux go build -o $NAME
+mv $NAME $NAME-linux-v$VERSION
+tar -zcvf $NAME-linux-v$VERSION.tgz $NAME-linux-v$VERSION
+rm -rf $NAME-linux-v$VERSION

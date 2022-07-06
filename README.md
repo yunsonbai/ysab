@@ -8,19 +8,19 @@ ysab 是一个可以帮助你获取http服务器压力测试性能指标的工�
 ## 安装
 * mac
 
-wget https://github.com/yunsonbai/ysab/releases/download/install-tool/install_mac -O install_mac && sh install_mac && rm -rf install_mac
+curl -L -o install_mac.sh https://github.com/yunsonbai/ysab/releases/download/install-tool/install_mac.sh && sh install_mac.sh && rm -rf install_mac.sh
 
 如果报权限问题请执行:
-wget https://github.com/yunsonbai/ysab/releases/download/install-tool/install_mac -O install_mac && sudo sh install_mac && rm -rf install_mac
+curl -L -o install_mac.sh https://github.com/yunsonbai/ysab/releases/download/install-tool/install_mac.sh && sudo sh install_mac.sh && rm -rf install_mac.sh
 
 如果安装完后不能输入 ysab 命令，可以重启终端或者执行 source /etc/profile
 
 * linux
 
-wget https://github.com/yunsonbai/ysab/releases/download/install-tool/install_linux -O install_linux && sh install_linux && rm -rf install_linux
+curl -L -o install_linux.sh https://github.com/yunsonbai/ysab/releases/download/install-tool/install_linux.sh && sh install_linux.sh && rm -rf install_linux.sh
 
 如果报权限问题请执行:
-wget https://github.com/yunsonbai/ysab/releases/download/install-tool/install_linux -O install_linux && sudo sh install_linux && rm -rf install_linux
+curl -L -o install_linux.sh https://github.com/yunsonbai/ysab/releases/download/install-tool/install_linux.sh && sudo sh install_linux.sh && rm -rf install_linux.sh
 
 ## 参数说明
 * ysab -h

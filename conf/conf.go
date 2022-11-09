@@ -34,7 +34,7 @@ Options:
   -v  Show verison
   -urlsfile  The urls file path. If you set this Option, -u,-d,-r will be invalid
       eg:
-      -urlfile /tmp/urls.txt
+      -urlsfile /tmp/urls.txt
 `
 
 type Config struct {

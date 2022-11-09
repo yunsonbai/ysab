@@ -46,7 +46,7 @@ Options:
   -v  显示版本号
   -urlsfile  包含所有请求信息的文件，如果设置了该参数, -u,-d,-r 将会失效
       例如:
-      -urlfile /tmp/urls.txt
+      -urlsfile /tmp/urls.txt
 ```
 
 * 注意: -urlsfile 是实现发送携带不同参数请求的关键参数，文件详细内容，可参照examples/post_urls.txt 和 examples/get_urls.txt

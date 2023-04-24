@@ -66,7 +66,7 @@ func addTask() {
 			url = reqData.Url
 			body = reqData.Body
 		} else {
-			if i == config.UrlNum {
+			if i == int(config.UrlNum) {
 				done = 1
 			}
 		}
@@ -96,7 +96,7 @@ func StartWork() {
 		summary.HandleRes()
 		rwg.Done()
 	}()
-	for index := 0; index < config.N; index++ {
+	for index := 0; index < int(config.N); index++ {
 		go func() {
 			worker(config.Method)
 		}()

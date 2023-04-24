@@ -13,7 +13,6 @@ import (
 
 	"github.com/yunsonbai/ysab/conf"
 	"github.com/yunsonbai/ysab/summary"
-	"github.com/yunsonbai/ysab/tools"
 )
 
 const (
@@ -34,8 +33,8 @@ func init() {
 func creteHttpClient() *http.Client {
 	client := &http.Client{
 		Transport: &http.Transport{
-			MaxConnsPerHost:     config.N/clientsN + 128,
-			MaxIdleConnsPerHost: config.N/clientsN + 128,
+			MaxConnsPerHost:     int(config.N)/clientsN + 128,
+			MaxIdleConnsPerHost: int(config.N)/clientsN + 128,
 			DisableKeepAlives:   false,
 			DisableCompression:  false,
 		},
@@ -44,14 +43,14 @@ func creteHttpClient() *http.Client {
 	return client
 }
 
-func do(url, method, bodydata string, headers map[string]string) summary.Res {
+func do(url, method, bodydata string, headers map[string]string) summary.ResStruct {
 	var code int
 	var size, tmpt int64
 	var dnsStart, connStart, respStart, reqStart, delayStart int64
 	var dnsDuration, connDuration, respDuration, reqDuration, delayDuration int64
 	req, err := http.NewRequest(method, url, bytes.NewBuffer([]byte(bodydata)))
 	if err != nil {
-		return summary.Res{}
+		return summary.ResStruct{}
 	}
 	req.Header.Set("Accept", "*/*")
 	req.Header.Set("Connection", "keep-alive")
@@ -66,39 +65,43 @@ func do(url, method, bodydata string, headers map[string]string) summary.Res {
 
 	trace := &httptrace.ClientTrace{
 		DNSStart: func(info httptrace.DNSStartInfo) {
-			dnsStart = tools.GetNowUnixNano()
+			dnsStart = time.Now().UnixMicro()
 		},
 		DNSDone: func(dnsInfo httptrace.DNSDoneInfo) {
-			dnsDuration = tools.GetNowUnixNano() - dnsStart
+			dnsDuration = time.Now().UnixMicro() - dnsStart
 		},
 		GetConn: func(h string) {
-			connStart = tools.GetNowUnixNano()
+			connStart = time.Now().UnixMicro()
 		},
 		GotConn: func(connInfo httptrace.GotConnInfo) {
-			tmpt = tools.GetNowUnixNano()
+			tmpt = time.Now().UnixMicro()
 			if !connInfo.Reused {
-				connDuration = tmpt - connStart
+				if connStart <= 0 {
+					connDuration = 0
+				} else {
+					connDuration = tmpt - connStart
+				}
 			}
 			reqStart = tmpt
 		},
 		WroteRequest: func(w httptrace.WroteRequestInfo) {
-			tmpt = tools.GetNowUnixNano()
+			tmpt = time.Now().UnixMicro()
 			reqDuration = tmpt - reqStart
 			delayStart = tmpt
 		},
 		GotFirstResponseByte: func() {
-			tmpt = tools.GetNowUnixNano()
+			tmpt = time.Now().UnixMicro()
 			delayDuration = tmpt - delayStart
 			respStart = tmpt
 		},
 	}
 	req = req.WithContext(httptrace.WithClientTrace(req.Context(), trace))
-	tStart := tools.GetNowUnixNano()
+	tStart := time.Now().UnixMicro()
 
 	client := HttpClients[rand.Intn(clientsN)]
 	response, err := client.Do(req)
 
-	tEnd := tools.Now()
+	tEnd := time.Now()
 	if response != nil {
 		if response.ContentLength > -1 {
 			size = response.ContentLength
@@ -126,35 +129,34 @@ func do(url, method, bodydata string, headers map[string]string) summary.Res {
 		}
 	}
 
-	respDuration = tEnd.UnixNano() - respStart
+	respDuration = tEnd.UnixMicro() - respStart
 
-	return summary.Res{
-		Size:         int(size),
-		TimeStamp:    int(tEnd.UnixNano()),
-		TotalUseTime: float64((tEnd.UnixNano() - tStart) / 10e5),
+	return summary.ResStruct{
+		Size:         size,
+		TimeStamp:    tEnd.UnixMicro(),
+		TotalUseTime: tEnd.UnixMicro() - tStart,
 		Code:         code,
-		ConnTime:     float64(connDuration / 10e5),
-		DNSTime:      float64(dnsDuration / 10e5),
-		ReqTime:      float64(reqDuration / 10e5),
-		DelayTime:    float64(delayDuration / 10e5),
-		ResTime:      float64(respDuration / 10e5),
-	}
+		ConnTime:     connDuration,
+		DNSTime:      dnsDuration,
+		ReqTime:      reqDuration,
+		DelayTime:    delayDuration,
+		ResTime:      respDuration}
 
 }
 
-func Head(url, data string, headers map[string]string) summary.Res {
+func Head(url, data string, headers map[string]string) summary.ResStruct {
 	return do(url, "HEAD", data, headers)
 }
 
-func Get(url, data string, headers map[string]string) summary.Res {
+func Get(url, data string, headers map[string]string) summary.ResStruct {
 	return do(url, "GET", data, headers)
 }
-func Post(url, data string, headers map[string]string) summary.Res {
+func Post(url, data string, headers map[string]string) summary.ResStruct {
 	return do(url, "POST", data, headers)
 }
-func Put(url, data string, headers map[string]string) summary.Res {
+func Put(url, data string, headers map[string]string) summary.ResStruct {
 	return do(url, "PUT", data, headers)
 }
-func Delete(url, data string, headers map[string]string) summary.Res {
+func Delete(url, data string, headers map[string]string) summary.ResStruct {
 	return do(url, "DELETE", data, headers)
 }

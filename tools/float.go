@@ -2,10 +2,8 @@ package tools
 
 import (
 	"fmt"
-	"strconv"
 )
 
-func Decimal2(value float64) float64 {
-	value, _ = strconv.ParseFloat(fmt.Sprintf("%.3f", value), 64)
-	return value
+func FloatToStr3f(value float64) string {
+	return fmt.Sprintf("%.3f", value)
 }

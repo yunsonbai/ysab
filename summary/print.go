@@ -32,7 +32,7 @@ Time detail (ms)
   wait		{{.MinDelay}}		{{.AvgDelay}}		{{.MaxDelay}}
   resp		{{.MinRes}}		{{.AvgRes}}		{{.MaxRes}}		  
 
-Response Time histogram (code: requests):
+Status code detail:
 {{ formatMap .CodeDetail }}
 `
 )
@@ -56,7 +56,7 @@ var tmplFuncMap = template.FuncMap{
 	"formatMap": formatMap,
 }
 
-func Print(summaryData SummaryData) {
+func Print(summaryData SummaryDataStruct) {
 
 	tmpl, err := template.New("test").Funcs(tmplFuncMap).Parse(htmlTemplate)
 	if err != nil {

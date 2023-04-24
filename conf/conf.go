@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"time"
 
 	"github.com/yunsonbai/ysab/tools"
 )
@@ -38,17 +39,18 @@ Options:
 `
 
 type Config struct {
-	Round       int    // 请求多少轮, 只对Url有效
-	N           int    // 并发数
+	N           uint16 // 并发数
+	Round       uint32 // 请求多少轮, 只对Url有效
+	UrlNum      uint32
+	TimeOut     int64  //单次请求超时时间
 	Url         string // 需要请求的url, 与UrlFilePath只能一个有效
 	UrlFilePath string //url文件路径
-	UrlNum      int
 	Headers     map[string]string
-	TimeOut     int    //单次请求超时时间
 	Method      string // 请求方法
 	Body        string
-	StartTime   int
-	EndTime     int
+	StartTime   int64
+	EndTime     int64
+	TimeBase    int64
 }
 
 type headersSlice []string
@@ -102,7 +104,7 @@ func arrangeOptions() {
 	version := flag.Bool("v", false, "")
 	n := flag.Int("n", 0, "")
 	url := flag.String("u", "", "")
-	timeout := flag.Int("t", 10, "")
+	timeout := flag.Int64("t", 10, "")
 	urlsfile := flag.String("urlsfile", "", "")
 	flag.Parse()
 
@@ -134,17 +136,17 @@ func arrangeOptions() {
 		Conf.Headers[headers[1]] = headers[2]
 	}
 	Conf.Body = *body
-	if *n <= 0 {
-		confError(errors.New("(-n) Number must be greater than 0."))
+	if *n <= 0 || *n > 65535 {
+		confError(errors.New("(-n) Number must be 0<n<65535."))
 	}
-	Conf.N = *n
+	Conf.N = uint16(*n)
 	if *round <= 0 {
 		confError(errors.New("(-r) Round must be greater than 0."))
 	}
-	Conf.Round = *round
+	Conf.Round = uint32(*round)
 	Conf.Url = *url
-	if *timeout <= 0 {
-		confError(errors.New("(-t) timeout must be greater than 0."))
+	if *timeout <= 0 || *timeout > 60 {
+		confError(errors.New("(-t) timeout must be 0<t<=60."))
 	}
 	Conf.TimeOut = *timeout
 	if *url == "" && *urlsfile == "" {
@@ -156,7 +158,7 @@ func arrangeOptions() {
 
 func init() {
 	arrangeOptions()
-	Conf.UrlNum = Conf.N * Conf.Round
+	Conf.UrlNum = uint32(Conf.N) * Conf.Round
 	if Conf.UrlFilePath != "" {
 		fi, err := os.Open(Conf.UrlFilePath)
 		defer fi.Close()
@@ -164,7 +166,7 @@ func init() {
 			panic(err)
 		}
 		fbr = bufio.NewReader(fi)
-		count := 0
+		count := uint32(0)
 		for {
 			line, _, err := fbr.ReadLine()
 			if err == io.EOF {
@@ -182,5 +184,8 @@ func init() {
 	if Conf.TimeOut <= 0 || Conf.TimeOut > 60 {
 		Conf.TimeOut = 60
 	}
-	Conf.StartTime = int(tools.GetNowUnixNano())
+	Conf.TimeBase = 1000000
+	Conf.TimeOut = Conf.TimeOut * Conf.TimeBase
+	Conf.StartTime = time.Now().UnixMicro()
+
 }

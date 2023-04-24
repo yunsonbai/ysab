@@ -1,4 +1,13 @@
 # Change Log
+## v1.0.2
+2023-0424
+
+### Changed
+1. Correction result description
+2. Optimization Statistics.
+
+Compared with 1.0.1, the performance is improved by about 10%
+
 
 ## v1.0.1
 2021-0804

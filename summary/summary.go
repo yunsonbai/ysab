@@ -1,7 +1,7 @@
 package summary
 
 import (
-	"math"
+	"fmt"
 	"sort"
 	"strconv"
 	"sync"
@@ -12,67 +12,102 @@ import (
 
 var (
 	AnalysisData  sync.Map
-	ResChanel     = make(chan Res, 50000)
+	ResChanel     = make(chan ResStruct, 50000)
 	RunOverSignal = make(chan int, 1)
 
-	codeDetail  = make(map[int]int)
-	summaryData = SummaryData{
-		CodeDetail:        make(map[string]int),
-		WaitingTimeDetail: make(map[string]int),
-		MinConn:           float64(config.TimeOut),
-		MinDNS:            float64(config.TimeOut),
-		MinDelay:          float64(config.TimeOut),
-		MinReq:            float64(config.TimeOut),
-		MinUseTime:        float64(config.TimeOut),
-		MinRes:            float64(config.TimeOut),
+	codeDetail     = make(map[int]int)
+	summaryDataTmp = summaryDataTmpStruct{
+		MinConn:    config.TimeOut,
+		MinDNS:     config.TimeOut,
+		MinDelay:   config.TimeOut,
+		MinReq:     config.TimeOut,
+		MinUseTime: config.TimeOut,
+		MinRes:     config.TimeOut,
 	}
 	config    = conf.Conf
 	waitTimes = make([]float64, 0, config.UrlNum)
 )
 
-type Res struct {
-	Size         int
-	TimeStamp    int
-	TotalUseTime float64
+type ResStruct struct {
+	Size         int64
+	TimeStamp    int64
 	Code         int
-	ConnTime     float64
-	DNSTime      float64
-	ReqTime      float64
-	DelayTime    float64
-	ResTime      float64
+	TotalUseTime int64
+	ConnTime     int64
+	DNSTime      int64
+	ReqTime      int64
+	DelayTime    int64
+	ResTime      int64
 }
 
-type SummaryData struct {
-	CompleteRequests      int
-	FailedRequests        int
-	SuccessRequests       int
-	TimeToken             float64
-	TotalDataSize         int
-	AvgDataSize           int
+type summaryDataTmpStruct struct {
+	CompleteRequests      uint32
+	FailedRequests        uint32
+	SuccessRequests       uint32
+	TotalDataSize         int64
 	RequestsPerSec        float64
 	SuccessRequestsPerSec float64
 
-	MinUseTime        float64
-	MaxUseTime        float64
-	AvgUseTime        float64
+	MinUseTime int64 // 微妙级
+	MaxUseTime int64 // 微妙级
+	AvgUseTime int64 // 微妙级
+
+	AvgConn  int64 // 微妙级
+	MaxConn  int64 // 微妙级
+	MinConn  int64 // 微妙级
+	AvgDNS   int64 // 微妙级
+	MaxDNS   int64 // 微妙级
+	MinDNS   int64 // 微妙级
+	AvgReq   int64 // 微妙级
+	MaxReq   int64 // 微妙级
+	MinReq   int64 // 微妙级
+	AvgDelay int64 // 微妙级
+	MaxDelay int64 // 微妙级
+	MinDelay int64 // 微妙级
+	AvgRes   int64 // 微妙级
+	MaxRes   int64 // 微妙级
+	MinRes   int64 // 微妙级
+}
+
+type SummaryDataStruct struct {
+	CompleteRequests      uint32
+	FailedRequests        uint32
+	SuccessRequests       uint32
+	TimeToken             string
+	TotalDataSize         int64
+	AvgDataSize           string
+	RequestsPerSec        string
+	SuccessRequestsPerSec string
+
+	MinUseTime        string
+	MaxUseTime        string
+	AvgUseTime        string
 	CodeDetail        map[string]int
 	WaitingTimeDetail map[string]int
 
-	AvgConn  float64
-	MaxConn  float64
-	MinConn  float64
-	AvgDNS   float64
-	MaxDNS   float64
-	MinDNS   float64
-	AvgReq   float64
-	MaxReq   float64
-	MinReq   float64
-	AvgDelay float64
-	MaxDelay float64
-	MinDelay float64
-	AvgRes   float64
-	MaxRes   float64
-	MinRes   float64
+	AvgConn  string
+	MaxConn  string
+	MinConn  string
+	AvgDNS   string
+	MaxDNS   string
+	MinDNS   string
+	AvgReq   string
+	MaxReq   string
+	MinReq   string
+	AvgDelay string
+	MaxDelay string
+	MinDelay string
+	AvgRes   string
+	MaxRes   string
+	MinRes   string
+}
+
+func microToSecond(t int64) float64 {
+	return float64(t) / float64(config.TimeBase)
+}
+
+func microToMilli(t int64) float64 {
+	return 1000 * float64(t) / float64(config.TimeBase)
 }
 
 func HandleRes() {
@@ -81,9 +116,9 @@ func HandleRes() {
 		if !ok {
 			break
 		}
-		summaryData.CompleteRequests++
-		summaryData.TotalDataSize += res.Size
-		if summaryData.CompleteRequests == config.UrlNum {
+		summaryDataTmp.CompleteRequests++
+		summaryDataTmp.TotalDataSize += res.Size
+		if summaryDataTmp.CompleteRequests == config.UrlNum {
 			close(ResChanel)
 		}
 		code := res.Code
@@ -96,50 +131,70 @@ func HandleRes() {
 			config.EndTime = res.TimeStamp
 		}
 		if code > 299 || code < 200 {
-			summaryData.FailedRequests++
+			summaryDataTmp.FailedRequests++
 		} else {
-			summaryData.SuccessRequests++
+			summaryDataTmp.SuccessRequests++
 		}
-		summaryData.AvgUseTime += res.TotalUseTime
-		summaryData.AvgConn += res.ConnTime
-		summaryData.AvgDNS += res.DNSTime
-		summaryData.AvgDelay += res.DelayTime
-		summaryData.AvgReq += res.ReqTime
-		summaryData.AvgRes += res.ResTime
+		summaryDataTmp.AvgUseTime += res.TotalUseTime
+		summaryDataTmp.AvgConn += res.ConnTime
+		summaryDataTmp.AvgDNS += res.DNSTime
+		summaryDataTmp.AvgDelay += res.DelayTime
+		summaryDataTmp.AvgReq += res.ReqTime
+		summaryDataTmp.AvgRes += res.ResTime
 
-		summaryData.MinUseTime = math.Min(res.TotalUseTime, summaryData.MinUseTime)
-		summaryData.MinConn = math.Min(res.ConnTime, summaryData.MinConn)
-		summaryData.MinDNS = math.Min(res.DNSTime, summaryData.MinDNS)
-		summaryData.MinDelay = math.Min(res.DelayTime, summaryData.MinDelay)
-		summaryData.MinReq = math.Min(res.ReqTime, summaryData.MinReq)
-		summaryData.MinRes = math.Min(res.ResTime, summaryData.MinRes)
+		summaryDataTmp.MinUseTime = tools.MinInt64(res.TotalUseTime, summaryDataTmp.MinUseTime)
+		summaryDataTmp.MinConn = tools.MinInt64(res.ConnTime, summaryDataTmp.MinConn)
+		summaryDataTmp.MinDNS = tools.MinInt64(res.DNSTime, summaryDataTmp.MinDNS)
+		summaryDataTmp.MinDelay = tools.MinInt64(res.DelayTime, summaryDataTmp.MinDelay)
+		summaryDataTmp.MinReq = tools.MinInt64(res.ReqTime, summaryDataTmp.MinReq)
+		summaryDataTmp.MinRes = tools.MinInt64(res.ResTime, summaryDataTmp.MinRes)
 
-		summaryData.MaxUseTime = math.Max(res.TotalUseTime, summaryData.MaxUseTime)
-		summaryData.MaxConn = math.Max(res.ConnTime, summaryData.MaxConn)
-		summaryData.MaxDNS = math.Max(res.DNSTime, summaryData.MaxDNS)
-		summaryData.MaxDelay = math.Max(res.DelayTime, summaryData.MaxDelay)
-		summaryData.MaxReq = math.Max(res.ReqTime, summaryData.MaxReq)
-		summaryData.MaxRes = math.Max(res.ResTime, summaryData.MaxRes)
-		waitTimes = append(waitTimes, res.TotalUseTime)
-
+		summaryDataTmp.MaxUseTime = tools.MaxInt64(res.TotalUseTime, summaryDataTmp.MaxUseTime)
+		summaryDataTmp.MaxConn = tools.MaxInt64(res.ConnTime, summaryDataTmp.MaxConn)
+		summaryDataTmp.MaxDNS = tools.MaxInt64(res.DNSTime, summaryDataTmp.MaxDNS)
+		summaryDataTmp.MaxDelay = tools.MaxInt64(res.DelayTime, summaryDataTmp.MaxDelay)
+		summaryDataTmp.MaxReq = tools.MaxInt64(res.ReqTime, summaryDataTmp.MaxReq)
+		summaryDataTmp.MaxRes = tools.MaxInt64(res.ResTime, summaryDataTmp.MaxRes)
+		waitTimes = append(waitTimes, microToMilli(res.TotalUseTime))
 	}
 
-	summaryData.AvgUseTime = tools.Decimal2(summaryData.AvgUseTime / float64(config.UrlNum))
-	summaryData.AvgConn = tools.Decimal2(summaryData.AvgConn / float64(config.UrlNum))
-	summaryData.AvgDNS = tools.Decimal2(summaryData.AvgDNS / float64(config.UrlNum))
-	summaryData.AvgDelay = tools.Decimal2(summaryData.AvgDelay / float64(config.UrlNum))
-	summaryData.AvgReq = tools.Decimal2(summaryData.AvgReq / float64(config.UrlNum))
-	summaryData.AvgRes = tools.Decimal2(summaryData.AvgRes / float64(config.UrlNum))
-	summaryData.AvgDataSize = summaryData.TotalDataSize / config.UrlNum
+	summaryData := SummaryDataStruct{
+		CompleteRequests:  summaryDataTmp.CompleteRequests,
+		FailedRequests:    summaryDataTmp.FailedRequests,
+		SuccessRequests:   summaryDataTmp.SuccessRequests,
+		TotalDataSize:     summaryDataTmp.TotalDataSize,
+		MinUseTime:        tools.FloatToStr3f(microToSecond(summaryDataTmp.MinUseTime)),
+		MaxUseTime:        tools.FloatToStr3f(microToSecond(summaryDataTmp.MaxUseTime)),
+		CodeDetail:        make(map[string]int),
+		WaitingTimeDetail: make(map[string]int),
+
+		MaxConn:  tools.FloatToStr3f(microToSecond(summaryDataTmp.MaxConn)),
+		MinConn:  tools.FloatToStr3f(microToSecond(summaryDataTmp.MinConn)),
+		MaxDNS:   tools.FloatToStr3f(microToSecond(summaryDataTmp.MaxDNS)),
+		MinDNS:   tools.FloatToStr3f(microToSecond(summaryDataTmp.MinDNS)),
+		MaxReq:   tools.FloatToStr3f(microToSecond(summaryDataTmp.MaxReq)),
+		MinReq:   tools.FloatToStr3f(microToSecond(summaryDataTmp.MinReq)),
+		MaxDelay: tools.FloatToStr3f(microToSecond(summaryDataTmp.MaxDelay)),
+		MinDelay: tools.FloatToStr3f(microToSecond(summaryDataTmp.MinDelay)),
+		MaxRes:   tools.FloatToStr3f(microToSecond(summaryDataTmp.MaxRes)),
+		MinRes:   tools.FloatToStr3f(microToSecond(summaryDataTmp.MinRes))}
+
+	summaryData.AvgUseTime = tools.FloatToStr3f(microToSecond(summaryDataTmp.AvgUseTime) / float64(config.UrlNum))
+	summaryData.AvgConn = tools.FloatToStr3f(microToSecond(summaryDataTmp.AvgConn) / float64(config.UrlNum))
+	summaryData.AvgDNS = tools.FloatToStr3f(microToSecond(summaryDataTmp.AvgDNS) / float64(config.UrlNum))
+	summaryData.AvgDelay = tools.FloatToStr3f(microToSecond(summaryDataTmp.AvgDelay) / float64(config.UrlNum))
+	summaryData.AvgReq = tools.FloatToStr3f(microToSecond(summaryDataTmp.AvgReq) / float64(config.UrlNum))
+	summaryData.AvgRes = tools.FloatToStr3f(microToSecond(summaryDataTmp.AvgRes) / float64(config.UrlNum))
+	summaryData.AvgDataSize = tools.FloatToStr3f(float64(summaryDataTmp.TotalDataSize) / float64(config.UrlNum))
 
 	for k, v := range codeDetail {
 		summaryData.CodeDetail[strconv.Itoa(k)] = v
 	}
-
-	t := (float64(config.EndTime-config.StartTime) / 10e8)
-	summaryData.TimeToken = t
-	summaryData.RequestsPerSec = float64(config.UrlNum) / t
-	summaryData.SuccessRequestsPerSec = float64(summaryData.SuccessRequests) / t
+	fmt.Println("config.StartTime:", config.StartTime)
+	t := microToSecond(config.EndTime - config.StartTime)
+	summaryData.TimeToken = tools.FloatToStr3f(t)
+	summaryData.RequestsPerSec = tools.FloatToStr3f(float64(config.UrlNum) / t)
+	summaryData.SuccessRequestsPerSec = tools.FloatToStr3f(float64(summaryData.SuccessRequests) / t)
 	sort.Float64s(waitTimes)
 	waitTimesL := float64(len(waitTimes))
 	tps := []float64{0.1, 0.25, 0.5, 0.75, 0.9, 0.95, 0.99, 0.999, 0.9999}

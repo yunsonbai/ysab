@@ -27,20 +27,21 @@ func worker(method string) {
 	case "POST":
 		wf = yshttp.Post
 	case "PUT":
-		wf = yshttp.Post
+		wf = yshttp.Put
 	case "DELETE":
-		wf = yshttp.Post
+		wf = yshttp.Delete
 	case "HEAD":
 		wf = yshttp.Head
 	default:
 		return
 	}
+	readBuf := make([]byte, 32*1024)
 	for {
 		data, ok := <-urlChanel
 		if !ok {
 			return
 		}
-		summary.ResChanel <- wf(data[0], data[1], config.Headers)
+		summary.ResChanel <- wf(data[0], data[1], config.Headers, readBuf)
 	}
 }
 

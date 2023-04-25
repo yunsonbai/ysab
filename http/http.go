@@ -34,7 +34,7 @@ func creteHttpClient() *http.Client {
 	client := &http.Client{
 		Transport: &http.Transport{
 			MaxConnsPerHost:     int(config.N)/clientsN + 128,
-			MaxIdleConnsPerHost: int(config.N)/clientsN + 128,
+			MaxIdleConnsPerHost: int(config.N)/clientsN + 32,
 			DisableKeepAlives:   false,
 			DisableCompression:  false,
 		},
@@ -43,7 +43,7 @@ func creteHttpClient() *http.Client {
 	return client
 }
 
-func do(url, method, bodydata string, headers map[string]string) summary.ResStruct {
+func do(url, method, bodydata string, headers map[string]string, buf []byte) summary.ResStruct {
 	var code int
 	var size, tmpt int64
 	var dnsStart, connStart, respStart, reqStart, delayStart int64
@@ -100,8 +100,8 @@ func do(url, method, bodydata string, headers map[string]string) summary.ResStru
 
 	client := HttpClients[rand.Intn(clientsN)]
 	response, err := client.Do(req)
-
 	tEnd := time.Now()
+
 	if response != nil {
 		if response.ContentLength > -1 {
 			size = response.ContentLength
@@ -109,15 +109,6 @@ func do(url, method, bodydata string, headers map[string]string) summary.ResStru
 			size = 0
 		}
 		code = response.StatusCode
-		bSize := 32 * 1024
-		if int64(bSize) > size {
-			if size < 1 {
-				bSize = 1
-			} else {
-				bSize = int(size)
-			}
-		}
-		buf := make([]byte, bSize)
 		io.CopyBuffer(ioutil.Discard, response.Body, buf)
 		response.Body.Close()
 	} else {
@@ -144,19 +135,19 @@ func do(url, method, bodydata string, headers map[string]string) summary.ResStru
 
 }
 
-func Head(url, data string, headers map[string]string) summary.ResStruct {
-	return do(url, "HEAD", data, headers)
+func Head(url, data string, headers map[string]string, readBuf []byte) summary.ResStruct {
+	return do(url, "HEAD", data, headers, readBuf)
 }
 
-func Get(url, data string, headers map[string]string) summary.ResStruct {
-	return do(url, "GET", data, headers)
+func Get(url, data string, headers map[string]string, readBuf []byte) summary.ResStruct {
+	return do(url, "GET", data, headers, readBuf)
 }
-func Post(url, data string, headers map[string]string) summary.ResStruct {
-	return do(url, "POST", data, headers)
+func Post(url, data string, headers map[string]string, readBuf []byte) summary.ResStruct {
+	return do(url, "POST", data, headers, readBuf)
 }
-func Put(url, data string, headers map[string]string) summary.ResStruct {
-	return do(url, "PUT", data, headers)
+func Put(url, data string, headers map[string]string, readBuf []byte) summary.ResStruct {
+	return do(url, "PUT", data, headers, readBuf)
 }
-func Delete(url, data string, headers map[string]string) summary.ResStruct {
-	return do(url, "DELETE", data, headers)
+func Delete(url, data string, headers map[string]string, readBuf []byte) summary.ResStruct {
+	return do(url, "DELETE", data, headers, readBuf)
 }

@@ -3,6 +3,7 @@ package worker
 import (
 	"bufio"
 	"io"
+	"net/http"
 	"os"
 	"sync"
 	"time"
@@ -36,12 +37,16 @@ func worker(method string) {
 		return
 	}
 	readBuf := make([]byte, 32*1024)
+	var req *http.Request
+	if config.UrlFilePath == "" {
+		req = yshttp.GetReq(config.Url, method, config.Body, config.Headers)
+	}
 	for {
 		data, ok := <-urlChanel
 		if !ok {
 			return
 		}
-		summary.ResChanel <- wf(data[0], data[1], config.Headers, readBuf)
+		summary.ResChanel <- wf(req, data[0], data[1], config.Headers, readBuf)
 	}
 }
 

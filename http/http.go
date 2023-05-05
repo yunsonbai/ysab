@@ -2,8 +2,6 @@ package http
 
 import (
 	"bytes"
-	"io"
-	"io/ioutil"
 	"math/rand"
 	"net/http"
 	"net/http/httptrace"
@@ -43,14 +41,83 @@ func creteHttpClient() *http.Client {
 	return client
 }
 
-func do(url, method, bodydata string, headers map[string]string, buf []byte) summary.ResStruct {
-	var code int
-	var size, tmpt int64
+func do(req *http.Request, buf []byte) (sumRes summary.ResStruct) {
+	var tmpt int64
 	var dnsStart, connStart, respStart, reqStart, delayStart int64
-	var dnsDuration, connDuration, respDuration, reqDuration, delayDuration int64
+	trace := &httptrace.ClientTrace{
+		DNSStart: func(info httptrace.DNSStartInfo) {
+			dnsStart = time.Now().UnixMicro()
+		},
+		DNSDone: func(dnsInfo httptrace.DNSDoneInfo) {
+			sumRes.DNSTime = time.Now().UnixMicro() - dnsStart
+		},
+		GetConn: func(h string) {
+			connStart = time.Now().UnixMicro()
+		},
+		GotConn: func(connInfo httptrace.GotConnInfo) {
+			tmpt = time.Now().UnixMicro()
+			if !connInfo.Reused {
+				if connStart <= 0 {
+					sumRes.ConnTime = 0
+				} else {
+					sumRes.ConnTime = tmpt - connStart
+				}
+			}
+			reqStart = tmpt
+		},
+
+		WroteRequest: func(w httptrace.WroteRequestInfo) {
+			tmpt = time.Now().UnixMicro()
+			sumRes.ReqTime = tmpt - reqStart
+			delayStart = tmpt
+		},
+		GotFirstResponseByte: func() {
+			tmpt = time.Now().UnixMicro()
+			sumRes.DelayTime = tmpt - delayStart
+			respStart = tmpt
+		},
+	}
+	newReq := req.WithContext(httptrace.WithClientTrace(req.Context(), trace))
+	tStart := time.Now().UnixMicro()
+
+	client := HttpClients[rand.Intn(clientsN)]
+	response, err := client.Do(newReq)
+	tEnd := time.Now()
+
+	if response != nil {
+		if response.ContentLength > -1 {
+			sumRes.Size = response.ContentLength
+		} else {
+			sumRes.Size = 0
+		}
+		sumRes.Code = response.StatusCode
+		for {
+			_, er := response.Body.Read(buf)
+			if er != nil {
+				break
+			}
+		}
+		response.Body.Close()
+
+	} else {
+		sumRes.Code = 503
+		if err, ok := err.(*netulr.Error); ok {
+			if err.Timeout() {
+				sumRes.Code = 504
+			}
+		}
+	}
+	sumRes.TimeStamp = tEnd.UnixMicro()
+	sumRes.TotalUseTime = tEnd.UnixMicro() - tStart
+	sumRes.ResTime = tEnd.UnixMicro() - respStart
+
+	return
+}
+
+func GetReq(url, method, bodydata string, headers map[string]string) (req *http.Request) {
 	req, err := http.NewRequest(method, url, bytes.NewBuffer([]byte(bodydata)))
 	if err != nil {
-		return summary.ResStruct{}
+		return
 	}
 	req.Header.Set("Accept", "*/*")
 	req.Header.Set("Connection", "keep-alive")
@@ -62,92 +129,37 @@ func do(url, method, bodydata string, headers map[string]string, buf []byte) sum
 			req.Header.Set(k, v)
 		}
 	}
+	return
+}
 
-	trace := &httptrace.ClientTrace{
-		DNSStart: func(info httptrace.DNSStartInfo) {
-			dnsStart = time.Now().UnixMicro()
-		},
-		DNSDone: func(dnsInfo httptrace.DNSDoneInfo) {
-			dnsDuration = time.Now().UnixMicro() - dnsStart
-		},
-		GetConn: func(h string) {
-			connStart = time.Now().UnixMicro()
-		},
-		GotConn: func(connInfo httptrace.GotConnInfo) {
-			tmpt = time.Now().UnixMicro()
-			if !connInfo.Reused {
-				if connStart <= 0 {
-					connDuration = 0
-				} else {
-					connDuration = tmpt - connStart
-				}
-			}
-			reqStart = tmpt
-		},
-		WroteRequest: func(w httptrace.WroteRequestInfo) {
-			tmpt = time.Now().UnixMicro()
-			reqDuration = tmpt - reqStart
-			delayStart = tmpt
-		},
-		GotFirstResponseByte: func() {
-			tmpt = time.Now().UnixMicro()
-			delayDuration = tmpt - delayStart
-			respStart = tmpt
-		},
+func Head(req *http.Request, url, data string, headers map[string]string, readBuf []byte) summary.ResStruct {
+	if req == nil {
+		req = GetReq(url, "HEAD", data, headers)
 	}
-	req = req.WithContext(httptrace.WithClientTrace(req.Context(), trace))
-	tStart := time.Now().UnixMicro()
+	return do(req, readBuf)
+}
 
-	client := HttpClients[rand.Intn(clientsN)]
-	response, err := client.Do(req)
-	tEnd := time.Now()
-
-	if response != nil {
-		if response.ContentLength > -1 {
-			size = response.ContentLength
-		} else {
-			size = 0
-		}
-		code = response.StatusCode
-		io.CopyBuffer(ioutil.Discard, response.Body, buf)
-		response.Body.Close()
-	} else {
-		code = 503
-		if err, ok := err.(*netulr.Error); ok {
-			if err.Timeout() {
-				code = 504
-			}
-		}
+func Get(req *http.Request, url, data string, headers map[string]string, readBuf []byte) summary.ResStruct {
+	if req == nil {
+		req = GetReq(url, "GET", data, headers)
 	}
-
-	respDuration = tEnd.UnixMicro() - respStart
-
-	return summary.ResStruct{
-		Size:         size,
-		TimeStamp:    tEnd.UnixMicro(),
-		TotalUseTime: tEnd.UnixMicro() - tStart,
-		Code:         code,
-		ConnTime:     connDuration,
-		DNSTime:      dnsDuration,
-		ReqTime:      reqDuration,
-		DelayTime:    delayDuration,
-		ResTime:      respDuration}
-
+	return do(req, readBuf)
 }
-
-func Head(url, data string, headers map[string]string, readBuf []byte) summary.ResStruct {
-	return do(url, "HEAD", data, headers, readBuf)
+func Post(req *http.Request, url, data string, headers map[string]string, readBuf []byte) summary.ResStruct {
+	if req == nil {
+		req = GetReq(url, "POST", data, headers)
+	}
+	return do(req, readBuf)
 }
-
-func Get(url, data string, headers map[string]string, readBuf []byte) summary.ResStruct {
-	return do(url, "GET", data, headers, readBuf)
+func Put(req *http.Request, url, data string, headers map[string]string, readBuf []byte) summary.ResStruct {
+	if req == nil {
+		req = GetReq(url, "PUT", data, headers)
+	}
+	return do(req, readBuf)
 }
-func Post(url, data string, headers map[string]string, readBuf []byte) summary.ResStruct {
-	return do(url, "POST", data, headers, readBuf)
-}
-func Put(url, data string, headers map[string]string, readBuf []byte) summary.ResStruct {
-	return do(url, "PUT", data, headers, readBuf)
-}
-func Delete(url, data string, headers map[string]string, readBuf []byte) summary.ResStruct {
-	return do(url, "DELETE", data, headers, readBuf)
+func Delete(req *http.Request, url, data string, headers map[string]string, readBuf []byte) summary.ResStruct {
+	if req == nil {
+		req = GetReq(url, "DELETE", data, headers)
+	}
+	return do(req, readBuf)
 }

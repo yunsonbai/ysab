@@ -51,16 +51,16 @@ Options:
 * Note: -urlsfile is the key parameter for sending requests with different parameters. For details of the file, please refer to examples/post_urls.txt and examples/get_urls.txt
 
 ## Some examples
-* e1: ysab -n 900 -r 2 -u http://10.10.10.10:8080/test
+* e1: ysab -n 900 -r 2 -u 'http://10.10.10.10:8080/test'
 * e2: ysab -n 900 -urlsfile ./examples/get_urls.txt
-* e3: ysab -n 900 -r 2 -m POST -u http://10.10.10.10:8080/add -d '{"name": "yunson"}'
+* e3: ysab -n 900 -r 2 -m POST -u 'http://10.10.10.10:8080/add' -d '{"name": "yunson"}'
 * e4: ysab -n 900 -urlsfile -m POST ./examples/post_urls.txt
 
 ## Result show
 ```
 (http://10.10.10.10:8080/test is API, it is writed by gin. The api will respone "hello world".)
 
-[yunson ~]# ysab -n 900 -r 30 -u http://10.10.10.10:8080/test
+[yunson ~]# ysab -n 900 -r 30 -u 'http://10.10.10.10:8080/test'
 
 Summary:
   Complete requests:		2700

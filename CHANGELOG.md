@@ -5,6 +5,7 @@
 ### Changed
 1. Correction result description
 2. Optimization Statistics.
+3. Fix Put/Delete bug.
 
 Compared with 1.0.1, the performance is improved by about 10%
 

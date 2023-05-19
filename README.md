@@ -52,16 +52,16 @@ Options:
 * 注意: -urlsfile 是实现发送携带不同参数请求的关键参数，文件详细内容，可参照examples/post_urls.txt 和 examples/get_urls.txt
 
 ## 一些例子
-* 1: ysab -n 900 -r 2 -u http://10.10.10.10:8080/test
+* 1: ysab -n 900 -r 2 -u 'http://10.10.10.10:8080/test'
 * 2: ysab -n 900 -urlsfile ./examples/get_urls.txt
-* 3: ysab -n 900 -r 2 -m POST -u http://10.10.10.10:8080/add -d '{"name": "yunson"}'
+* 3: ysab -n 900 -r 2 -m POST -u 'http://10.10.10.10:8080/add' -d '{"name": "yunson"}'
 * 4: ysab -n 900 -m POST -urlsfile ./examples/post_urls.txt
 
 ## 结果展示
 ```
 (http://10.10.10.10:8080/test 是一个借助gin完成的测试 API. 这个 API 的 response 是 "hello world".)
 
-[yunson ~]# ysab -n 900 -r 30 -u http://10.10.10.10:8080/test
+[yunson ~]# ysab -n 900 -r 30 -u 'http://10.10.10.10:8080/test'
 
 Summary:
   Complete requests:		2700
@@ -124,7 +124,7 @@ urls.txt example:
 * use -u
 
 ```
-example:
+example(以下三个方式都可以, 若有特殊符号建议用''包裹):
     ysab -n 900 -r 30 -u "http://10.121.130.218:8080/test"
     ysab -n 900 -r 30 -u 'http://10.121.130.218:8080/test'
     ysab -n 900 -r 30 -u http://10.121.130.218:8080/test

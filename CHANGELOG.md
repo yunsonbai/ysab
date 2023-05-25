@@ -6,8 +6,9 @@
 1. Correction result description
 2. Optimization Statistics.
 3. Fix Put/Delete bug.
+4. Add transfer metrics: TransferRate/sec (Byte).
 
-Compared with 1.0.1, the performance is improved by about 10%
+Compared with 1.0.1, the performance is improved by about 10%.
 
 
 ## v1.0.1

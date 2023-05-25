@@ -21,6 +21,7 @@ Summary:
   Average use time (ms):	{{.AvgUseTime}}
   Requests/sec:			{{ .RequestsPerSec }}
   SuccessRequests/sec:		{{ .SuccessRequestsPerSec }}
+  TransferRate/sec (Byte):	{{ .STransferRatePerSec }}
 
 Percentage of waiting time (ms):
 {{ formatMap .WaitingTimeDetail }}

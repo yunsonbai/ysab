@@ -40,12 +40,10 @@ type ResStruct struct {
 }
 
 type summaryDataTmpStruct struct {
-	CompleteRequests      uint32
-	FailedRequests        uint32
-	SuccessRequests       uint32
-	TotalDataSize         int64
-	RequestsPerSec        float64
-	SuccessRequestsPerSec float64
+	CompleteRequests uint32
+	FailedRequests   uint32
+	SuccessRequests  uint32
+	TotalDataSize    int64
 
 	MinUseTime int64 // 微妙级
 	MaxUseTime int64 // 微妙级
@@ -77,6 +75,7 @@ type SummaryDataStruct struct {
 	AvgDataSize           string
 	RequestsPerSec        string
 	SuccessRequestsPerSec string
+	STransferRatePerSec   string
 
 	MinUseTime        string
 	MaxUseTime        string
@@ -196,6 +195,7 @@ func HandleRes() {
 	summaryData.TimeToken = tools.FloatToStr3f(t)
 	summaryData.RequestsPerSec = tools.FloatToStr3f(float64(config.UrlNum) / t)
 	summaryData.SuccessRequestsPerSec = tools.FloatToStr3f(float64(summaryData.SuccessRequests) / t)
+	summaryData.STransferRatePerSec = tools.FloatToStr3f(float64(summaryData.TotalDataSize) / t)
 
 	tps := []float64{0.1, 0.25, 0.5, 0.75, 0.9, 0.95, 0.99, 0.999, 0.9999}
 	tpsL := len(tps)

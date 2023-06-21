@@ -21,6 +21,9 @@ curl -L -o install_linux.sh https://github.com/yunsonbai/ysab/releases/download/
 If report a permission problem, please execute:
 curl -L -o install_linux.sh https://github.com/yunsonbai/ysab/releases/download/install-tool/install_linux.sh && sudo sh install_linux.sh && rm -rf install_linux.sh
 
+* arm
+If you need to run the arm version, you can clone a copy of the code, build it on the arm machine (go build -o ysab), and then put the executable file ysab under /usr/local/bin/
+
 ## Usage
 * ysab -h
 

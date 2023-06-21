@@ -22,6 +22,9 @@ curl -L -o install_linux.sh https://github.com/yunsonbai/ysab/releases/download/
 如果报权限问题请执行:
 curl -L -o install_linux.sh https://github.com/yunsonbai/ysab/releases/download/install-tool/install_linux.sh && sudo sh install_linux.sh && rm -rf install_linux.sh
 
+* arm
+如果需要运行arm版本，可以clone一份代码，在arm机上build一下(go build -o ysab)，然后把可执行文件ysab放到/usr/local/bin/下即可
+
 ## 参数说明
 * ysab -h
 

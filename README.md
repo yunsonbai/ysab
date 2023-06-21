@@ -34,9 +34,11 @@ Options:
   -r  压测轮数，总的请求量是 r * n
   -n  并发数，最大900，最小1
   -m  HTTP method, 可选值 GET，POST，PUT，DELETE，Head，默认GET
-  -u  Url of request, 使用 " 括起来
+  -u  Url of request, 如果有特殊符号需要用引号
       例如: 
       -u "https://yunsonbai.top/?name=yunson"
+      -u 'https://yunsonbai.top/?name=yunson'
+      -u https://yunsonbai.top/?name=yunson
   -H  添加请求头
       例如:
       -H "Accept: text/html"  设置 Accept

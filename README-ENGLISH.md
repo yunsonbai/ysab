@@ -33,9 +33,11 @@ Options:
   -r  Rounds of request to run, total requests equal r * n
   -n  Number of simultaneous requests, 0<n<=900, depends on machine performance.
   -m  HTTP method, one of GET, POST, PUT, DELETE, Head, Default is GET
-  -u  Url of request, use " please
-      eg: 
+  -u  Url of request, quotes are recommended if there are envoy symbols
+      eg:
       -u 'https://yunsonbai.top/?name=yunson'
+      -u "https://yunsonbai.top/?name=yunson"
+      -u https://yunsonbai.top/?name=yunson
   -H  Add Arbitrary header line
       eg:
       -H "Accept: text/html", Set Accept to header

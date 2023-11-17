@@ -8,23 +8,20 @@ ysab 是一个可以帮助你获取http服务器压力测试性能指标的工�
 ## 安装
 * mac
 
-curl -L -o install_mac.sh https://github.com/yunsonbai/ysab/releases/download/install-tool/install_mac.sh && sh install_mac.sh && rm -rf install_mac.sh
+    * curl -L -o install_mac.sh https://github.com/yunsonbai/ysab/releases/download/install-tool/install_mac.sh && sh install_mac.sh && rm -rf install_mac.sh
 
-如果报权限问题请执行:
-curl -L -o install_mac.sh https://github.com/yunsonbai/ysab/releases/download/install-tool/install_mac.sh && sudo sh install_mac.sh && rm -rf install_mac.sh
+    * 如果报权限问题请执行: curl -L -o install_mac.sh https://github.com/yunsonbai/ysab/releases/download/install-tool/install_mac.sh && sudo sh install_mac.sh && rm -rf install_mac.sh
 
-如果安装完后不能输入 ysab 命令，可以重启终端或者执行 source /etc/profile
+        ```如果安装完后不能输入 ysab 命令，可以重启终端```
 
 * linux
 
-curl -L -o install_linux.sh https://github.com/yunsonbai/ysab/releases/download/install-tool/install_linux.sh && sh install_linux.sh && rm -rf install_linux.sh
+    * curl -L -o install_linux.sh https://github.com/yunsonbai/ysab/releases/download/install-tool/install_linux.sh && sh install_linux.sh && rm -rf install_linux.sh
 
-如果报权限问题请执行:
-curl -L -o install_linux.sh https://github.com/yunsonbai/ysab/releases/download/install-tool/install_linux.sh && sudo sh install_linux.sh && rm -rf install_linux.sh
+    * 如果报权限问题请执行: curl -L -o install_linux.sh https://github.com/yunsonbai/ysab/releases/download/install-tool/install_linux.sh && sudo sh install_linux.sh && rm -rf install_linux.sh
 
 * arm
-
-如果需要运行arm版本，可以clone一份代码，在arm机上build一下(go build -o ysab)，然后把可执行文件ysab放到/usr/local/bin/下即可
+    * 如果需要运行arm版本，可以clone一份代码，在arm机上build一下(go build -o ysab)，然后把可执行文件ysab放到/usr/local/bin/下即可
 
 ## 参数说明
 * ysab -h
@@ -33,6 +30,7 @@ curl -L -o install_linux.sh https://github.com/yunsonbai/ysab/releases/download/
 Options:
   -r  压测轮数，总的请求量是 r * n
   -n  并发数，最大900，最小1
+  -T  运行时间(单位秒, 默认0), T大于0时, r无效
   -m  HTTP method, 可选值 GET，POST，PUT，DELETE，Head，默认GET
   -u  Url of request, 如果有特殊符号需要用引号
       例如: 
@@ -58,16 +56,39 @@ Options:
 * 注意: -urlsfile 是实现发送携带不同参数请求的关键参数，文件详细内容，可参照examples/post_urls.txt 和 examples/get_urls.txt
 
 ## 一些例子
-* 1: ysab -n 900 -r 2 -u 'http://10.10.10.10:8080/test'
-* 2: ysab -n 900 -urlsfile ./examples/get_urls.txt
-* 3: ysab -n 900 -r 2 -m POST -u 'http://10.10.10.10:8080/add' -d '{"name": "yunson"}'
-* 4: ysab -n 900 -m POST -urlsfile ./examples/post_urls.txt
+1. GET请求，300个协程一起处理，每个协程做2轮
+
+    ysab -n 300 -r 2 -u 'http://10.10.10.10:8080/test'
+
+2. POST请求，400个协程一起处理，每个协程做2轮
+  
+    ysab -n 300 -r 2 -m POST -u 'http://10.10.10.10:8080/add' -d '{"name": "yunson"}'
+
+3. GET请求，400个协程一起处理，持续100秒
+  
+    ysab -n 300 -T 100 -u 'http://10.10.10.10:8080/test'
+
+4. POST请求，400个协程一起处理，持续100秒测试
+
+    ysab -n 300 -T 100 -m POST -u 'http://10.10.10.10:8080/add' -d '{"name": "yunson"}'
+
+5. GET请求，400个协程一起处理urls.txt中的连接，处理2次urls.txt中的连接
+
+    ysab -r 2 -n 400 -urlsfile ./examples/urls.txt
+
+6. GET请求，400个协程一起处理urls.txt中的连接，一直循环执行文件中的连接，持续100秒
+
+    ysab -T 100 -n 400 -urlsfile ./examples/urls.txt
+
+7. POST请求，400个协程一起处理urls.txt中的连接，一直循环执行文件中的连接，持续100秒
+
+    ysab -T 100 -n 400 -m POST -urlsfile ./examples/urls.txt
 
 ## 结果展示
 ```
-(http://10.10.10.10:8080/test 是一个借助gin完成的测试 API. 这个 API 的 response 是 "hello world".)
+(http://10.10.10.10:8080/test 是一个借助gin完成的测试API, 限速. 这个 API 的 response 是 "hello world".)
 
-[yunson ~]# ysab -n 900 -r 30 -u 'http://10.10.10.10:8080/test'
+[yunson ~]# ysab -n 900 -r 3 -u 'http://10.10.10.10:8080/test'
 
 Summary:
   Complete requests:		2700
@@ -113,29 +134,24 @@ Response Time histogram (code: requests):
         * 503: May be connection refused or connection reset by peer, you need to check your server.
     * other: [http code](https://en.wikipedia.org/wiki/List_of_HTTP_status_codes)
 
-## 注意
-* 推荐使用 -urlsfile
-```
-你可以使用 -urlsfile 发送携带不同 body 或 url 的请求
+## 关于引号的使用
+以下三个方式都可以, 若有特殊符号建议用''包裹
+* ysab -n 900 -r 50 -u "http://10.121.130.218:8080/test"
+* ysab -n 900 -r 50 -u 'http://10.121.130.218:8080/test'
+* ysab -n 900 -r 50 -u http://10.121.130.218:8080/test
 
-样例:
-	ysab -n 500 -urlsfile ./examples/get_urls.txt
-    ysab -n 500 -m POST -urlsfile ./examples/post_urls.txt
+## 其他
+推荐使用 -urlsfile, 你可以使用 -urlsfile 发送携带不同 body 或 url 的请求
 
-urls.txt example:
-	examples/urls.txt
-	You can use create_urls.py to create a urls.txt file.
-```
+* 样例:
+	* ysab -r 1 -n 500 -urlsfile ./examples/urls.txt
+    * ysab -r 2 -n 500 -m POST -urlsfile ./examples/post_urls.txt
+    * ysab -T 30 -n 500 -m POST -urlsfile ./examples/post_urls.txt
 
-* use -u
+* urls.txt example:
+	* examples/xx_urls.txt
+	* You can use create_urls.py to create a urls.txt file.
 
-```
-example(以下三个方式都可以, 若有特殊符号建议用''包裹):
-    ysab -n 900 -r 30 -u "http://10.121.130.218:8080/test"
-    ysab -n 900 -r 30 -u 'http://10.121.130.218:8080/test'
-    ysab -n 900 -r 30 -u http://10.121.130.218:8080/test
-
-```
 
 ## 鸣谢
 * [Jason-Liu-Dream](https://github.com/Jason-Liu-Dream)

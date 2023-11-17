@@ -1,6 +1,7 @@
 package summary
 
 import (
+	"fmt"
 	"sort"
 	"strconv"
 	"sync"
@@ -11,23 +12,23 @@ import (
 
 var (
 	AnalysisData  sync.Map
-	ResChanel     = make(chan ResStruct, 4000)
+	ResChanel     = make(chan ResStruct, conf.Conf.SumResChNum)
 	RunOverSignal = make(chan int, 1)
 
 	codeDetail     = make(map[int]int)
 	summaryDataTmp = summaryDataTmpStruct{
-		MinConn:    config.TimeOut,
-		MinDNS:     config.TimeOut,
-		MinDelay:   config.TimeOut,
-		MinReq:     config.TimeOut,
-		MinUseTime: config.TimeOut,
-		MinRes:     config.TimeOut,
+		MinConn:    conf.Conf.TimeOut,
+		MinDNS:     conf.Conf.TimeOut,
+		MinDelay:   conf.Conf.TimeOut,
+		MinReq:     conf.Conf.TimeOut,
+		MinUseTime: conf.Conf.TimeOut,
+		MinRes:     conf.Conf.TimeOut,
 	}
-	config    = conf.Conf
 	waitTimes = make(map[int64]int)
 )
 
 type ResStruct struct {
+	EndMk        bool
 	Size         int64
 	TimeStamp    int64
 	Code         int
@@ -40,9 +41,9 @@ type ResStruct struct {
 }
 
 type summaryDataTmpStruct struct {
-	CompleteRequests uint32
-	FailedRequests   uint32
-	SuccessRequests  uint32
+	CompleteRequests int64
+	FailedRequests   int64
+	SuccessRequests  int64
 	TotalDataSize    int64
 
 	MinUseTime int64 // 微妙级
@@ -67,9 +68,9 @@ type summaryDataTmpStruct struct {
 }
 
 type SummaryDataStruct struct {
-	CompleteRequests      uint32
-	FailedRequests        uint32
-	SuccessRequests       uint32
+	CompleteRequests      int64
+	FailedRequests        int64
+	SuccessRequests       int64
 	TimeToken             string
 	TotalDataSize         int64
 	AvgDataSize           string
@@ -101,11 +102,11 @@ type SummaryDataStruct struct {
 }
 
 func microToSecond(t int64) float64 {
-	return float64(t) / float64(config.TimeBase)
+	return float64(t) / float64(conf.Conf.TimeBase)
 }
 
 func microToMilli(t int64) int64 {
-	return 1000 * t / config.TimeBase
+	return 1000 * t / conf.Conf.TimeBase
 }
 
 func HandleRes() {
@@ -116,15 +117,25 @@ func HandleRes() {
 		if !ok {
 			break
 		}
+		if res.EndMk {
+			fmt.Println("2sum:", summaryDataTmp.CompleteRequests, conf.Conf.UrlNum, len(ResChanel))
+			if summaryDataTmp.CompleteRequests == conf.Conf.UrlNum {
+				close(ResChanel)
+				break
+			} else {
+				continue
+			}
+		}
 		summaryDataTmp.CompleteRequests++
 		summaryDataTmp.TotalDataSize += res.Size
-		if summaryDataTmp.CompleteRequests == config.UrlNum {
+		if conf.Conf.UrlNum > 0 && summaryDataTmp.CompleteRequests == conf.Conf.UrlNum {
+			fmt.Println("1sum:", summaryDataTmp.CompleteRequests, conf.Conf.UrlNum)
 			close(ResChanel)
 		}
 		code = res.Code
 		codeDetail[code]++
-		if config.EndTime < res.TimeStamp {
-			config.EndTime = res.TimeStamp
+		if conf.Conf.EndTime < res.TimeStamp {
+			conf.Conf.EndTime = res.TimeStamp
 		}
 		if code > 299 || code < 200 {
 			summaryDataTmp.FailedRequests++
@@ -180,20 +191,20 @@ func HandleRes() {
 		MaxRes:   tools.FloatToStr3f(microToSecond(summaryDataTmp.MaxRes)),
 		MinRes:   tools.FloatToStr3f(microToSecond(summaryDataTmp.MinRes))}
 
-	summaryData.AvgUseTime = tools.FloatToStr3f(microToSecond(summaryDataTmp.AvgUseTime) / float64(config.UrlNum))
-	summaryData.AvgConn = tools.FloatToStr3f(microToSecond(summaryDataTmp.AvgConn) / float64(config.UrlNum))
-	summaryData.AvgDNS = tools.FloatToStr3f(microToSecond(summaryDataTmp.AvgDNS) / float64(config.UrlNum))
-	summaryData.AvgDelay = tools.FloatToStr3f(microToSecond(summaryDataTmp.AvgDelay) / float64(config.UrlNum))
-	summaryData.AvgReq = tools.FloatToStr3f(microToSecond(summaryDataTmp.AvgReq) / float64(config.UrlNum))
-	summaryData.AvgRes = tools.FloatToStr3f(microToSecond(summaryDataTmp.AvgRes) / float64(config.UrlNum))
-	summaryData.AvgDataSize = tools.FloatToStr3f(float64(summaryDataTmp.TotalDataSize) / float64(config.UrlNum))
+	summaryData.AvgUseTime = tools.FloatToStr3f(microToSecond(summaryDataTmp.AvgUseTime) / float64(conf.Conf.UrlNum))
+	summaryData.AvgConn = tools.FloatToStr3f(microToSecond(summaryDataTmp.AvgConn) / float64(conf.Conf.UrlNum))
+	summaryData.AvgDNS = tools.FloatToStr3f(microToSecond(summaryDataTmp.AvgDNS) / float64(conf.Conf.UrlNum))
+	summaryData.AvgDelay = tools.FloatToStr3f(microToSecond(summaryDataTmp.AvgDelay) / float64(conf.Conf.UrlNum))
+	summaryData.AvgReq = tools.FloatToStr3f(microToSecond(summaryDataTmp.AvgReq) / float64(conf.Conf.UrlNum))
+	summaryData.AvgRes = tools.FloatToStr3f(microToSecond(summaryDataTmp.AvgRes) / float64(conf.Conf.UrlNum))
+	summaryData.AvgDataSize = tools.FloatToStr3f(float64(summaryDataTmp.TotalDataSize) / float64(conf.Conf.UrlNum))
 
 	for k, v := range codeDetail {
 		summaryData.CodeDetail[strconv.Itoa(k)] = v
 	}
-	t := microToSecond(config.EndTime - config.StartTime)
+	t := microToSecond(conf.Conf.EndTime - conf.Conf.StartTime)
 	summaryData.TimeToken = tools.FloatToStr3f(t)
-	summaryData.RequestsPerSec = tools.FloatToStr3f(float64(config.UrlNum) / t)
+	summaryData.RequestsPerSec = tools.FloatToStr3f(float64(conf.Conf.UrlNum) / t)
 	summaryData.SuccessRequestsPerSec = tools.FloatToStr3f(float64(summaryData.SuccessRequests) / t)
 	summaryData.STransferRatePerSec = tools.FloatToStr3f(float64(summaryData.TotalDataSize) / t)
 
@@ -202,7 +213,7 @@ func HandleRes() {
 	tpsCount := make([]int, tpsL)
 	tkeys := []int{}
 	for i, v := range tps {
-		tpsCount[i] = int(float64(config.UrlNum) * v)
+		tpsCount[i] = int(float64(conf.Conf.UrlNum) * v)
 	}
 	for k, _ := range waitTimes {
 		tkeys = append(tkeys, int(k))

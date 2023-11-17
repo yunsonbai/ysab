@@ -15,7 +15,6 @@ import (
 
 var (
 	rwg       sync.WaitGroup
-	config    = conf.Conf
 	urlChanel = make(chan [2]string, 30000)
 )
 
@@ -41,24 +40,24 @@ func worker(method string) {
 		if !ok {
 			return
 		}
-		summary.ResChanel <- wf(data[0], data[1], config.Headers, readBuf)
+		summary.ResChanel <- wf(data[0], data[1], conf.Conf.Headers, readBuf)
 	}
 }
 
 func addTask() {
 	i := 0
-	url := config.Url
-	body := config.Body
+	url := conf.Conf.Url
+	body := conf.Conf.Body
 	var fbr *bufio.Reader
-	if config.UrlFilePath != "" {
-		fi, _ := os.Open(config.UrlFilePath)
+	if conf.Conf.UrlFilePath != "" {
+		fi, _ := os.Open(conf.Conf.UrlFilePath)
 		defer fi.Close()
 		fbr = bufio.NewReader(fi)
 	}
 	done := 0
 	for {
 		i++
-		if config.UrlFilePath != "" {
+		if conf.Conf.UrlFilePath != "" {
 			line, _, err := fbr.ReadLine()
 			if err == io.EOF {
 				done = 1
@@ -67,7 +66,7 @@ func addTask() {
 			url = reqData.Url
 			body = reqData.Body
 		} else {
-			if i == int(config.UrlNum) {
+			if i == int(conf.Conf.UrlNum) {
 				done = 1
 			}
 		}
@@ -97,9 +96,9 @@ func StartWork() {
 		summary.HandleRes()
 		rwg.Done()
 	}()
-	for index := 0; index < int(config.N); index++ {
+	for index := 0; index < int(conf.Conf.N); index++ {
 		go func() {
-			worker(config.Method)
+			worker(conf.Conf.Method)
 		}()
 	}
 	rwg.Wait()

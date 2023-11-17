@@ -19,7 +19,6 @@ const (
 
 var (
 	HttpClients []*http.Client
-	config      = conf.Conf
 )
 
 func init() {
@@ -31,12 +30,12 @@ func init() {
 func creteHttpClient() *http.Client {
 	client := &http.Client{
 		Transport: &http.Transport{
-			MaxConnsPerHost:     int(config.N)/clientsN + 128,
-			MaxIdleConnsPerHost: int(config.N)/clientsN + 32,
+			MaxConnsPerHost:     int(conf.Conf.N)/clientsN + 128,
+			MaxIdleConnsPerHost: int(conf.Conf.N)/clientsN + 32,
 			DisableKeepAlives:   false,
 			DisableCompression:  false,
 		},
-		Timeout: time.Duration(config.TimeOut) * time.Second,
+		Timeout: time.Duration(conf.Conf.TimeOut) * time.Second,
 	}
 	return client
 }

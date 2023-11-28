@@ -45,7 +45,7 @@ Options:
       '{"a": "a"}'
   -h  This help
   -v  Show verison
-  -urlsfile  The urls file path. If you set this Option, -u,-d,-r will be invalid
+  -urlsfile  The urls file path. If you set this Option, -u,-d will be invalid
       eg:
       -urlsfile /tmp/urls.txt
 ```

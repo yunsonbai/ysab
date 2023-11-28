@@ -48,7 +48,7 @@ Options:
       '{"a": "a"}'
   -h  帮助
   -v  显示版本号
-  -urlsfile  包含所有请求信息的文件，如果设置了该参数, -u,-d,-r 将会失效
+  -urlsfile  包含所有请求信息的文件，如果设置了该参数, -u,-d 将会失效
       例如:
       -urlsfile /tmp/urls.txt
 ```

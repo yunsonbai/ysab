@@ -63,35 +63,38 @@ func addTaskByFile(useDuration bool) {
 	}
 	defer file.Close()
 	fbr := bufio.NewReader(file)
-	endT := time.Now().Unix() + int64(conf.Conf.Duration)
+	stopChan := make(chan struct{})
+	if useDuration {
+		go func() {
+			time.Sleep(time.Duration(conf.Conf.Duration) * time.Second)
+			close(stopChan)
+		}()
+	}
 	for {
+		if useDuration {
+			select {
+			case <-stopChan:
+				over = true
+			default:
+			}
+		}
+		if over {
+			break
+		}
 		line, _, err := fbr.ReadLine()
 		if err == io.EOF {
-			if useDuration {
-				if time.Now().Unix() >= endT {
-					over = true
-				}
-			} else {
+			if !useDuration {
 				curR++
 				if curR >= conf.Conf.Round {
 					over = true
+					break
 				}
 			}
-
-			if over {
-				conf.Conf.UrlNum = count
-				summary.ResChanel <- summary.ResStruct{EndMk: true}
-				fmt.Println("curR:", curR, "count:", count, "--body:", body,
-					"conf.Conf.UrlNum:", conf.Conf.UrlNum)
-				break
-			}
-
 			if _, err := file.Seek(0, io.SeekStart); err != nil {
 				panic(err)
 			}
 			continue
 		}
-
 		reqData := ystools.GetReqData(string(line))
 		url = reqData.Url
 		body = reqData.Body
@@ -101,18 +104,29 @@ func addTaskByFile(useDuration bool) {
 			urlChanel <- data
 		}
 	}
+	conf.Conf.UrlNum = count
+	summary.ResChanel <- summary.ResStruct{EndMk: true}
+	fmt.Println("curR:", curR, "count:", count, "--body:", body,
+		"conf.Conf.UrlNum:", conf.Conf.UrlNum)
 }
 
 func addTaskByCmd(useDuration bool) {
 	totalUrlNum := int64(conf.Conf.Round) * int64(conf.Conf.N)
 	var count int64
 	var over bool
-	endT := time.Now().Unix() + int64(conf.Conf.Duration)
+	stopChan := make(chan struct{})
+	if useDuration {
+		go func() {
+			time.Sleep(time.Duration(conf.Conf.Duration) * time.Second)
+			close(stopChan)
+		}()
+	}
 	for {
-
 		if useDuration {
-			if time.Now().Unix() >= endT {
+			select {
+			case <-stopChan:
 				over = true
+			default:
 			}
 		} else {
 			if count >= totalUrlNum {
@@ -121,18 +135,17 @@ func addTaskByCmd(useDuration bool) {
 		}
 
 		if over {
-			conf.Conf.UrlNum = count
-			summary.ResChanel <- summary.ResStruct{EndMk: true}
-			fmt.Println(
-				"count:", count, "--body:", conf.Conf.Body,
-				"conf.Conf.UrlNum:", conf.Conf.UrlNum)
 			break
 		}
-
 		data := [2]string{conf.Conf.Url, conf.Conf.Body}
 		count++
 		urlChanel <- data
 	}
+	conf.Conf.UrlNum = count
+	summary.ResChanel <- summary.ResStruct{EndMk: true}
+	fmt.Println(
+		"count:", count, "--body:", conf.Conf.Body,
+		"conf.Conf.UrlNum:", conf.Conf.UrlNum)
 }
 
 func addTask() {
@@ -158,6 +171,7 @@ func addTask() {
 func StartWork() {
 	rwg.Add(1)
 	go addTask()
+	conf.Conf.StartTime = time.Now().UnixMicro()
 	go func() {
 		summary.HandleRes()
 		rwg.Done()

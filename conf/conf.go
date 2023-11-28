@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"os"
 	"runtime"
-	"time"
 
 	"github.com/yunsonbai/ysab/tools"
 )
@@ -34,7 +33,7 @@ Options:
       '{"a": "a"}'
   -h  This help
   -v  Show verison
-  -urlsfile  The urls file path. If you set this Option, -u,-d,-r will be invalid
+  -urlsfile  The urls file path. If you set this Option, -u,-d will be invalid
       eg:
       -urlsfile /tmp/urls.txt
 `
@@ -180,7 +179,7 @@ func init() {
 	}
 	Conf.TimeBase = 1000000
 	Conf.TimeOut = Conf.TimeOut * Conf.TimeBase
-	Conf.StartTime = time.Now().UnixMicro()
+	// Conf.StartTime = time.Now().UnixMicro()
 	numCPU := runtime.NumCPU()
 	Conf.UrlChNum = int(Conf.N) * numCPU
 	Conf.SumResChNum = int(Conf.N) * numCPU / 2

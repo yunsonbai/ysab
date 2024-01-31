@@ -2,7 +2,6 @@ package worker
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -106,8 +105,6 @@ func addTaskByFile(useDuration bool) {
 	}
 	conf.Conf.UrlNum = count
 	summary.ResChanel <- summary.ResStruct{EndMk: true}
-	fmt.Println("curR:", curR, "count:", count, "--body:", body,
-		"conf.Conf.UrlNum:", conf.Conf.UrlNum)
 }
 
 func addTaskByCmd(useDuration bool) {
@@ -143,9 +140,6 @@ func addTaskByCmd(useDuration bool) {
 	}
 	conf.Conf.UrlNum = count
 	summary.ResChanel <- summary.ResStruct{EndMk: true}
-	fmt.Println(
-		"count:", count, "--body:", conf.Conf.Body,
-		"conf.Conf.UrlNum:", conf.Conf.UrlNum)
 }
 
 func addTask() {

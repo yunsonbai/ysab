@@ -1,7 +1,6 @@
 package summary
 
 import (
-	"fmt"
 	"sort"
 	"strconv"
 	"sync"
@@ -118,7 +117,6 @@ func HandleRes() {
 			break
 		}
 		if res.EndMk {
-			fmt.Println("2sum:", summaryDataTmp.CompleteRequests, conf.Conf.UrlNum, len(ResChanel))
 			if summaryDataTmp.CompleteRequests == conf.Conf.UrlNum {
 				close(ResChanel)
 				break
@@ -129,7 +127,6 @@ func HandleRes() {
 		summaryDataTmp.CompleteRequests++
 		summaryDataTmp.TotalDataSize += res.Size
 		if conf.Conf.UrlNum > 0 && summaryDataTmp.CompleteRequests == conf.Conf.UrlNum {
-			fmt.Println("1sum:", summaryDataTmp.CompleteRequests, conf.Conf.UrlNum)
 			close(ResChanel)
 		}
 		code = res.Code

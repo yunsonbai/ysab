@@ -74,19 +74,6 @@ func (h *headersSlice) Set(value string) error {
 	return nil
 }
 
-// func useConfile(filepath string) {
-// 	configFile, err := os.Open(filepath)
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	defer configFile.Close()
-// 	jsonParser := json.NewDecoder(configFile)
-// 	err = jsonParser.Decode(&Conf)
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// }
-
 func confError(err error) {
 	fmt.Println(usage)
 	fmt.Println(err)

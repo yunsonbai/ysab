@@ -67,6 +67,7 @@ type summaryDataTmpStruct struct {
 }
 
 type SummaryDataStruct struct {
+	Version               string
 	CompleteRequests      int64
 	FailedRequests        int64
 	SuccessRequests       int64
@@ -104,8 +105,16 @@ func microToSecond(t int64) float64 {
 	return float64(t) / float64(conf.Conf.TimeBase)
 }
 
-func microToMilli(t int64) int64 {
+func microToMillI(t int64) int64 {
 	return 1000 * t / conf.Conf.TimeBase
+}
+
+func microToMillF(t int64) float64 {
+	return 1000 * float64(t) / float64(conf.Conf.TimeBase)
+}
+
+func microToMilliStr(t int64) string {
+	return strconv.Itoa(int(microToMillI(t)))
 }
 
 func HandleRes() {
@@ -160,7 +169,7 @@ func HandleRes() {
 		summaryDataTmp.MaxReq = tools.MaxInt64(res.ReqTime, summaryDataTmp.MaxReq)
 		summaryDataTmp.MaxRes = tools.MaxInt64(res.ResTime, summaryDataTmp.MaxRes)
 
-		tkey = microToMilli(res.TotalUseTime)
+		tkey = microToMillI(res.TotalUseTime)
 		// if tkey > 3000 {
 		// 	tkey = tkey / 1000 * 1000
 		// }
@@ -172,28 +181,28 @@ func HandleRes() {
 		FailedRequests:    summaryDataTmp.FailedRequests,
 		SuccessRequests:   summaryDataTmp.SuccessRequests,
 		TotalDataSize:     summaryDataTmp.TotalDataSize,
-		MinUseTime:        tools.FloatToStr3f(microToSecond(summaryDataTmp.MinUseTime)),
-		MaxUseTime:        tools.FloatToStr3f(microToSecond(summaryDataTmp.MaxUseTime)),
+		MinUseTime:        microToMilliStr(summaryDataTmp.MinUseTime),
+		MaxUseTime:        microToMilliStr(summaryDataTmp.MaxUseTime),
 		CodeDetail:        make(map[string]int),
 		WaitingTimeDetail: make(map[string]int),
 
-		MaxConn:  tools.FloatToStr3f(microToSecond(summaryDataTmp.MaxConn)),
-		MinConn:  tools.FloatToStr3f(microToSecond(summaryDataTmp.MinConn)),
-		MaxDNS:   tools.FloatToStr3f(microToSecond(summaryDataTmp.MaxDNS)),
-		MinDNS:   tools.FloatToStr3f(microToSecond(summaryDataTmp.MinDNS)),
-		MaxReq:   tools.FloatToStr3f(microToSecond(summaryDataTmp.MaxReq)),
-		MinReq:   tools.FloatToStr3f(microToSecond(summaryDataTmp.MinReq)),
-		MaxDelay: tools.FloatToStr3f(microToSecond(summaryDataTmp.MaxDelay)),
-		MinDelay: tools.FloatToStr3f(microToSecond(summaryDataTmp.MinDelay)),
-		MaxRes:   tools.FloatToStr3f(microToSecond(summaryDataTmp.MaxRes)),
-		MinRes:   tools.FloatToStr3f(microToSecond(summaryDataTmp.MinRes))}
+		MaxConn:  microToMilliStr(summaryDataTmp.MaxConn),
+		MinConn:  microToMilliStr(summaryDataTmp.MinConn),
+		MaxDNS:   microToMilliStr(summaryDataTmp.MaxDNS),
+		MinDNS:   microToMilliStr(summaryDataTmp.MinDNS),
+		MaxReq:   microToMilliStr(summaryDataTmp.MaxReq),
+		MinReq:   microToMilliStr(summaryDataTmp.MinReq),
+		MaxDelay: microToMilliStr(summaryDataTmp.MaxDelay),
+		MinDelay: microToMilliStr(summaryDataTmp.MinDelay),
+		MaxRes:   microToMilliStr(summaryDataTmp.MaxRes),
+		MinRes:   microToMilliStr(summaryDataTmp.MinRes)}
 
-	summaryData.AvgUseTime = tools.FloatToStr3f(microToSecond(summaryDataTmp.AvgUseTime) / float64(conf.Conf.UrlNum))
-	summaryData.AvgConn = tools.FloatToStr3f(microToSecond(summaryDataTmp.AvgConn) / float64(conf.Conf.UrlNum))
-	summaryData.AvgDNS = tools.FloatToStr3f(microToSecond(summaryDataTmp.AvgDNS) / float64(conf.Conf.UrlNum))
-	summaryData.AvgDelay = tools.FloatToStr3f(microToSecond(summaryDataTmp.AvgDelay) / float64(conf.Conf.UrlNum))
-	summaryData.AvgReq = tools.FloatToStr3f(microToSecond(summaryDataTmp.AvgReq) / float64(conf.Conf.UrlNum))
-	summaryData.AvgRes = tools.FloatToStr3f(microToSecond(summaryDataTmp.AvgRes) / float64(conf.Conf.UrlNum))
+	summaryData.AvgUseTime = tools.FloatToStr3f(microToMillF(summaryDataTmp.AvgUseTime) / float64(conf.Conf.UrlNum))
+	summaryData.AvgConn = tools.FloatToStr3f(microToMillF(summaryDataTmp.AvgConn) / float64(conf.Conf.UrlNum))
+	summaryData.AvgDNS = tools.FloatToStr3f(microToMillF(summaryDataTmp.AvgDNS) / float64(conf.Conf.UrlNum))
+	summaryData.AvgDelay = tools.FloatToStr3f(microToMillF(summaryDataTmp.AvgDelay) / float64(conf.Conf.UrlNum))
+	summaryData.AvgReq = tools.FloatToStr3f(microToMillF(summaryDataTmp.AvgReq) / float64(conf.Conf.UrlNum))
+	summaryData.AvgRes = tools.FloatToStr3f(microToMillF(summaryDataTmp.AvgRes) / float64(conf.Conf.UrlNum))
 	summaryData.AvgDataSize = tools.FloatToStr3f(float64(summaryDataTmp.TotalDataSize) / float64(conf.Conf.UrlNum))
 
 	for k, v := range codeDetail {
@@ -235,5 +244,6 @@ func HandleRes() {
 			j++
 		}
 	}
+	summaryData.Version = conf.VERSION
 	Print(summaryData)
 }

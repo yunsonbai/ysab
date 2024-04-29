@@ -9,7 +9,8 @@ import (
 )
 
 var (
-	htmlTemplate = `
+	htmlTemplate = `Ysab: {{ .Version }}
+
 Summary:
   Complete requests:		{{ .CompleteRequests }}
   Failed requests:		{{ .FailedRequests }}

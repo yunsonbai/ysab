@@ -1,7 +1,9 @@
 package http
 
 import (
+	"bufio"
 	"bytes"
+	"io"
 	"math/rand"
 	"net/http"
 	"net/http/httptrace"
@@ -40,7 +42,7 @@ func creteHttpClient() *http.Client {
 	return client
 }
 
-func do(req *http.Request, buf []byte) (sumRes summary.ResStruct) {
+func do(req *http.Request, bufioReader *bufio.Reader) (sumRes summary.ResStruct) {
 	var tmpt int64
 	var dnsStart, connStart, respStart, reqStart, delayStart int64
 	trace := &httptrace.ClientTrace{
@@ -82,21 +84,21 @@ func do(req *http.Request, buf []byte) (sumRes summary.ResStruct) {
 	client := HttpClients[rand.Intn(clientsN)]
 	response, err := client.Do(newReq)
 	tEnd := time.Now()
-
 	if response != nil {
+
+		sumRes.Code = response.StatusCode
+		defer response.Body.Close()
+		bufioReader.Reset(response.Body)
+		_, err = io.Copy(io.Discard, bufioReader)
+		if err != nil {
+			sumRes.Code = 500
+		}
+		tEnd = time.Now()
 		if response.ContentLength > -1 {
 			sumRes.Size = response.ContentLength
 		} else {
 			sumRes.Size = 0
 		}
-		sumRes.Code = response.StatusCode
-		for {
-			_, er := response.Body.Read(buf)
-			if er != nil {
-				break
-			}
-		}
-		response.Body.Close()
 
 	} else {
 		sumRes.Code = 503
@@ -131,34 +133,34 @@ func GetReq(url, method, bodydata string, headers map[string]string) (req *http.
 	return
 }
 
-func Head(req *http.Request, url, data string, headers map[string]string, readBuf []byte) summary.ResStruct {
+func Head(req *http.Request, url, data string, headers map[string]string, bufioReader *bufio.Reader) summary.ResStruct {
 	if req == nil {
 		req = GetReq(url, "HEAD", data, headers)
 	}
-	return do(req, readBuf)
+	return do(req, bufioReader)
 }
 
-func Get(req *http.Request, url, data string, headers map[string]string, readBuf []byte) summary.ResStruct {
+func Get(req *http.Request, url, data string, headers map[string]string, bufioReader *bufio.Reader) summary.ResStruct {
 	if req == nil {
 		req = GetReq(url, "GET", data, headers)
 	}
-	return do(req, readBuf)
+	return do(req, bufioReader)
 }
-func Post(req *http.Request, url, data string, headers map[string]string, readBuf []byte) summary.ResStruct {
+func Post(req *http.Request, url, data string, headers map[string]string, bufioReader *bufio.Reader) summary.ResStruct {
 	if req == nil {
 		req = GetReq(url, "POST", data, headers)
 	}
-	return do(req, readBuf)
+	return do(req, bufioReader)
 }
-func Put(req *http.Request, url, data string, headers map[string]string, readBuf []byte) summary.ResStruct {
+func Put(req *http.Request, url, data string, headers map[string]string, bufioReader *bufio.Reader) summary.ResStruct {
 	if req == nil {
 		req = GetReq(url, "PUT", data, headers)
 	}
-	return do(req, readBuf)
+	return do(req, bufioReader)
 }
-func Delete(req *http.Request, url, data string, headers map[string]string, readBuf []byte) summary.ResStruct {
+func Delete(req *http.Request, url, data string, headers map[string]string, bufioReader *bufio.Reader) summary.ResStruct {
 	if req == nil {
 		req = GetReq(url, "DELETE", data, headers)
 	}
-	return do(req, readBuf)
+	return do(req, bufioReader)
 }

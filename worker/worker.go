@@ -36,7 +36,8 @@ func worker(method string) {
 	default:
 		return
 	}
-	readBuf := make([]byte, 32*1024)
+	// readBuf := make([]byte, 32*1024)
+	bufioReader := bufio.NewReaderSize(nil, conf.Conf.ReaderBufSize)
 	var req *http.Request
 	if conf.Conf.UrlFilePath == "" {
 		req = yshttp.GetReq(conf.Conf.Url, method, conf.Conf.Body, conf.Conf.Headers)
@@ -46,7 +47,7 @@ func worker(method string) {
 		if !ok {
 			return
 		}
-		summary.ResChanel <- wf(req, data[0], data[1], conf.Conf.Headers, readBuf)
+		summary.ResChanel <- wf(req, data[0], data[1], conf.Conf.Headers, bufioReader)
 	}
 }
 

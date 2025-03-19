@@ -43,6 +43,7 @@ Options:
   -d  HTTP request body. 
       eg:
       '{"a": "a"}'
+  -b  reader buf size(KB), default 256
   -h  This help
   -v  Show verison
   -urlsfile  The urls file path. If you set this Option, -u,-d will be invalid

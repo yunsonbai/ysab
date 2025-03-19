@@ -1,6 +1,7 @@
 install_linux.sh
 install_mac.sh
 *.sh
+._.DS_Store
 .DS_Store
 *log.txt
 .idea/

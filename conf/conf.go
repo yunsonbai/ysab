@@ -31,6 +31,7 @@ Options:
   -d  HTTP request body
       eg:
       '{"a": "a"}'
+  -b  reader buf size(KB), default 256
   -h  This help
   -v  Show verison
   -urlsfile  The urls file path. If you set this Option, -u,-d will be invalid
@@ -39,21 +40,22 @@ Options:
 `
 
 type Config struct {
-	N           uint16
-	Round       uint32 // 轮次
-	Duration    int    // 持续时间
-	UrlNum      int64
-	TimeOut     int64
-	Url         string
-	UrlFilePath string
-	Headers     map[string]string
-	Method      string
-	Body        string
-	StartTime   int64
-	EndTime     int64
-	TimeBase    int64
-	UrlChNum    int
-	SumResChNum int
+	N             uint16
+	Round         uint32 // 轮次
+	Duration      int    // 持续时间
+	UrlNum        int64
+	TimeOut       int64
+	Url           string
+	UrlFilePath   string
+	Headers       map[string]string
+	Method        string
+	Body          string
+	ReaderBufSize int
+	StartTime     int64
+	EndTime       int64
+	TimeBase      int64
+	UrlChNum      int
+	SumResChNum   int
 }
 
 type headersSlice []string
@@ -92,6 +94,8 @@ func arrangeOptions() {
 	version := flag.Bool("v", false, "")
 	n := flag.Int("n", 0, "")
 	body := flag.String("d", "", "")
+	readerBufSize := flag.Int("b", 0, "")
+
 	duration := flag.Int("T", 0, "")
 	method := flag.String("m", "GET", "")
 	url := flag.String("u", "", "")
@@ -138,6 +142,11 @@ func arrangeOptions() {
 
 	if *round < 0 {
 		confError(errors.New("(-r) Round must be greater than 0"))
+	}
+	if *readerBufSize < 0 {
+		Conf.ReaderBufSize = 256 * 1024
+	} else {
+		Conf.ReaderBufSize = *readerBufSize * 1024
 	}
 	Conf.Round = uint32(*round)
 	if Conf.Duration < 0 {

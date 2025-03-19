@@ -4,9 +4,11 @@
 2023-1118
 
 ### Changed
-1. 当使用urlsfile参数时，r参数也生效支持多轮测试。(r takes effect when using urlsfile, supporting multiple rounds of testing)
-2. 新增T参数，支持连续测试T秒。T大于0时，r失效。(Added T to support continuous testing for T seconds. r is invalid when T is greater than 0)
-3. 优化一些代码。(Optimize some code)
+1. 当使用urlsfile参数时，r参数也生效支持多轮测试 (r takes effect when using urlsfile, supporting multiple rounds of testing)
+2. 新增T参数，支持连续测试T秒。T大于0时，r失效 (Added T to support continuous testing for T seconds. r is invalid when T is greater than 0)
+3. 优化一些代码 (Optimize some code)
+4. 添加-b参数, 读取body体的buf大小, 默认256K (-b reader buf size, default 256K)
+5. 基于go1.22.12编写 (Based on go1.22.12)
 
 ## v1.0.2
 2023-0424
